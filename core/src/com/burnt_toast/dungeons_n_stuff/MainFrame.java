@@ -55,8 +55,8 @@ public class MainFrame extends Game {
 	public boolean fadeIn, fadeOut;
 	public String fadeCodename;//since I can't use lambda's I have to return a codename of who called me
 	
-	public static final float SCREEN_WIDTH = 16 * 30;//480
-	public static final float SCREEN_HEIGHT = 10 * 30;
+	public static final float SCREEN_WIDTH = 12 * 30;//480
+	public static final float SCREEN_HEIGHT = 6 * 30;
 	
 	public static final float TILE_SIZE = 8;//8 * 2
 	

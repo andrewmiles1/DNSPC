@@ -86,8 +86,6 @@ public class MiniMap {
 		}
 		playerXnY.x = x;
 		playerXnY.y = y;
-		System.out.println("Passed : " + x + " to activate as X");
-		System.out.println("Passed : " + y + " to activate as Y");
 		if(textMap[x][y+1] == 0){//if UP is not a wall
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x][y+1+i] == 0){

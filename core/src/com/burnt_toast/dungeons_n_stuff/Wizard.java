@@ -2,7 +2,7 @@ package com.burnt_toast.dungeons_n_stuff;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Wizard extends Character{
+public class Wizard extends Player{
 
 	public Wizard() {
 		super(MainFrame.wizardFrames);

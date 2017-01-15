@@ -14,13 +14,9 @@ public abstract class Character {
 	protected float exp;
 	protected int level;
 	protected float nextLevelExp;
-	protected float specialCharge;
-	protected boolean specialCooling;//used to know if the special is used and cooling down or not.
-	protected float coolDownIncrement;//how much it cools a second
 	protected float meeleePause;
 	protected float[] meeleeDamage;//range of 2 numbers
 	protected float[] rangedDamage;//range of 2 numbers
-	protected float[] specialDamage;//range of 2 numbers
 	protected boolean isMoving;
 	protected char direction;//facing direction
 	protected boolean flipped;//used when flipping the character.

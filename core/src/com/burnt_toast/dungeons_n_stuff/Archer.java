@@ -2,7 +2,7 @@ package com.burnt_toast.dungeons_n_stuff;
 
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 
-public class Archer extends Character{
+public class Archer extends Player{
 	private int arrowCount;//how many arrows do I have
 	private int arrowMax;//how many arrows can I carry
 	

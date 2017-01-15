@@ -3,7 +3,7 @@ package com.burnt_toast.dungeons_n_stuff;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
-public class Warrior extends Character{
+public class Warrior extends Player{
 
 	public Warrior() {
 		super(MainFrame.warriorFrames);
