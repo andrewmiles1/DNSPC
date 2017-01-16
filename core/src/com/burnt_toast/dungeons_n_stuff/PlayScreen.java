@@ -129,6 +129,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		playStage.getBatch().begin();
 		currentPlayer.draw((SpriteBatch)playStage.getBatch());
+		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
 		main.gameFont.draw(playStage.getBatch(), "X : " + dragChangeX + "|Y: " + dragChangeY, 0, 0);
 		playStage.getBatch().end();
 		

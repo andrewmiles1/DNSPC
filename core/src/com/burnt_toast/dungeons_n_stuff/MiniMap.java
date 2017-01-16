@@ -136,6 +136,27 @@ public class MiniMap {
 		}
 	}
 	
+	public void drawVisibilityOnMap(SpriteBatch batch){
+		for(int i = visibilityMap.length-1; i >= 0; i--){
+			for(int k = 0; k < visibilityMap[0].length; k++){
+				if(visibilityMap[i][k] == 0){//unseen floor
+					if(i == visibilityMap.length - 1){//if on top
+						batch.draw(this.unseenTilePic,
+								i * MainFrame.TILE_SIZE + MainFrame.TILE_SIZE,//just one above the tile
+								k * MainFrame.TILE_SIZE,
+								MainFrame.TILE_SIZE * 3, MainFrame.TILE_SIZE * 1);//top bar to hide walls
+					}//end if on top
+					if(k == 1){//if on left of stuff
+						batch.draw(this.unseenTilePic,
+								i * MainFrame.TILE_SIZE,
+								k * MainFrame.TILE_SIZE - MainFrame.TILE_SIZE,//just one to left of tile
+								MainFrame.TILE_SIZE * 1, MainFrame.TILE_SIZE * 3);//left bar to hide walls
+					}
+				}
+			}
+		}
+	}
+	
 	public void draw(SpriteBatch batch){
 		if(!visible)return;
 		for(int i = textMap.length-1; i >=0; i --){
