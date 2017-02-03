@@ -18,7 +18,9 @@ public class Monster extends Character{
 	@Override
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
-		
+		if(flipped == true){
+			batch.draw(this., x, y, width, height, srcX, srcY, srcWidth, srcHeight, flipX, flipY);
+		}
 	}
 	@Override
 	public void attack() {

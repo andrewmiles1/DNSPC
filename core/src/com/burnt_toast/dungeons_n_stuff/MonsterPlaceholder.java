@@ -3,8 +3,9 @@ package com.burnt_toast.dungeons_n_stuff;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
+import com.burnt_toast.monster_generator.Poolable;
 
-public class MonsterPlaceholder {
+public class MonsterPlaceholder extends Poolable{
 	private float xKathrynRocks;
 	private float y;
 	private float sightRadius;
@@ -68,6 +69,21 @@ public class MonsterPlaceholder {
 				< sightRadius){//if the distance between the two is less than vis.
 			activated = true;//then it saw something.
 		}
+	}
+
+	@Override
+	public void reset() {
+		//reset anykthing that needs reseting. 
+		
+	}
+
+	@Override
+	public void retire() {
+		// TODO Auto-generated method stub
+		activated = false;
+		xKathrynRocks = 0;
+		y = 0;
+		image = null;
 	}
 	
 	
