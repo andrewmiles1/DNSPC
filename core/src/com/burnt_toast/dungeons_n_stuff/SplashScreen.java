@@ -165,6 +165,9 @@ public class SplashScreen implements Screen{
 			main.ringStages[0] = new TextureRegion(main.mainTileset, 0, 59, 10, 10);
 			main.ringStages[1] = new TextureRegion(main.mainTileset, 10, 59, 10, 10);
 			main.ringStages[2] = new TextureRegion(main.mainTileset, 20, 59, 10, 10);
+			
+			//ALL DEM SLIME FRAMES
+			//main.slimeFrames[0] = new TextureRegion(main.characterTexture)
 			break;
 		case 2:
 			main.wizardFrames = new TextureRegion[5];

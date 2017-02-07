@@ -25,6 +25,7 @@ public abstract class Character {
 	protected float frameSizeY;
 	protected float meleeSizeX;
 	protected float meleeSizeY;
+	protected TextureRegion[] frames;
 	
 	
 	protected Rectangle collisionRect;
@@ -37,7 +38,7 @@ public abstract class Character {
 	protected int animationIndex;//used for animation, which frame. 0 or 1.
 	protected float animationTimer;
 	
-	public Character(TextureRegion[] frames){//i pass the frames for sizes
+	public Character(TextureRegion[] passedFrames){//i pass the frames for sizes
 		movementSpeed = 32;//32 pixels per second.
 		animationSpeed = 0.25f;//animates every fourth a second.
 		collisionRect = new Rectangle(0, 0, frames[1].getRegionWidth(), frames[1].getRegionHeight() / 2);
@@ -46,6 +47,7 @@ public abstract class Character {
 		frameSizeY = frames[1].getRegionHeight();
 		meleeSizeX = frames[2].getRegionWidth();
 		meleeSizeY = frames[2].getRegionHeight();
+		frames = passedFrames;
 		
 	}
 	

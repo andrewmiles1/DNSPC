@@ -45,6 +45,9 @@ public class MainFrame extends Game {
 	public static TextureRegion[] wizardFrames;//0 and 1 are person and 2 is meelee 
 	public static TextureRegion[] warriorFrames;//0 and 1 are person and 2 is meelee and 3 is throwing sword.
 	
+	//teh monstas YEAH
+	public static TextureRegion[] slimeFrames;//0 and 1 are person and 2 is meelee and 3 is ranged
+	
 	public static TextureRegion[] swordStages;//0 1 and 2 are the 3 levels
 	public static TextureRegion[] ringStages;
 	public static TextureRegion[] arrowStages;
