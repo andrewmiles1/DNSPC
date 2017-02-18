@@ -180,6 +180,7 @@ public class SplashScreen implements Screen{
 			main.warriorFrames[0] = new TextureRegion(main.characterTexture, 0, 0, 8, 9);//person 
 			main.warriorFrames[1] = new TextureRegion(main.characterTexture, 8, 0, 9, 9);//person step and attack
 			main.warriorFrames[2] = new TextureRegion(main.characterTexture, 18, 1, 6, 6);//meelee.
+			main.slimeFrames = main.wizardFrames;
 			break;
 		case 0:
 			main.silverFrame = new TextureRegion(MainFrame.mainTileset, 112, 24, 8, 8);

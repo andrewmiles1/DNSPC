@@ -1,11 +1,13 @@
 package com.burnt_toast.dungeons_n_stuff;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.burnt_toast.monster_generator.Poolable;
 
 public class Monster extends Character{
-	public Monster(TextureRegion[] frames) {
-		super(frames);
+	public Monster(TextureRegion[] passFrames) {
+		super(passFrames);
 		this.isMoving = true;
 		// TODO Auto-generated constructor stub
 	}
@@ -32,19 +34,42 @@ public class Monster extends Character{
 		// TODO Auto-generated method stub
 		
 	}
+	public void update(float playerX, float playerY){
+		move(playerX, playerY);
+		update();
+		
+	}
 	public void move(float playerX, float playerY){
 		if(playerX < this.getX()){
-			this.setPosition(this.getX()-this.movementSpeed, this.getY());
+			this.move('l');
+			//this.collisionRect.x -= this.movementSpeed * Gdx.graphics.getDeltaTime();
 		}
 		else if(playerX > this.getX()){
-			this.setPosition(this.getX()+this.movementSpeed, this.getY());
+			this.move('r');
+			//this.collisionRect.x += this.movementSpeed * Gdx.graphics.getDeltaTime();
 		}
-		if(playerY < this.getX()){
-			this.setPosition(this.getX(), this.getY() - this.movementSpeed);
+		if(playerY < this.getY()){
+			this.move('d');
+			//this.collisionRect.y -= this.movementSpeed * Gdx.graphics.getDeltaTime();
 		}
 		else if(playerY > this.getY()){
-			this.setPosition(this.getX(), this.getY() + this.movementSpeed);
+			this.move('u');
+			//this.collisionRect.y += this.movementSpeed * Gdx.graphics.getDeltaTime();
 		}
+		//this.move("slime");
+		//System.out.println("trying to move" + this.collisionRect.height);
+		//collision and stuff math
+		
+	}
+	@Override
+	public void reset() {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public void retire() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 

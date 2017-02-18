@@ -6,7 +6,7 @@ import com.badlogic.gdx.math.Vector3;
 import com.burnt_toast.monster_generator.Poolable;
 
 public class MonsterPlaceholder extends Poolable{
-	private float xKathrynRocks;
+	private float x;
 	private float y;
 	private float sightRadius;
 	private TextureRegion image;
@@ -17,7 +17,7 @@ public class MonsterPlaceholder extends Poolable{
 			float passSightRadius, TextureRegion passImage){
 		image = passImage;
 		sightRadius = passSightRadius;
-		xKathrynRocks = passX;
+		x = passX;
 		y = passY;
 		activated = false;
 		
@@ -29,14 +29,14 @@ public class MonsterPlaceholder extends Poolable{
 	}
 	
 	public void setX(float passX){
-		xKathrynRocks = passX;
+		x = passX;
 	}
 	
 	public void setY(float passY){
 		y = passY;
 	}
 	public float getX(){
-		return xKathrynRocks;
+		return x;
 	}
 	public void setIfActivated(boolean passActive){
 		activated = passActive;
@@ -51,7 +51,7 @@ public class MonsterPlaceholder extends Poolable{
 		return image;
 	}
 	public void draw(SpriteBatch batch){
-		batch.draw(image, xKathrynRocks,  y);
+		batch.draw(image, x,  y);
 	}
 	/**
 	 * This method is used primarily for hashing the visibilty
@@ -59,13 +59,13 @@ public class MonsterPlaceholder extends Poolable{
 	 * @return
 	 */
 	public Vector3  getRect(){
-		tempRect.x = this.xKathrynRocks - this.sightRadius;
+		tempRect.x = this.x - this.sightRadius;
 		tempRect.y = this.y - this.sightRadius;
 		tempRect.z = sightRadius;//the z holds the size of the square.
 		return tempRect;
 	}
-	public void checkVisibility(int passX, int passY){
-		if(Math.sqrt(Math.abs(passX-xKathrynRocks) + Math.abs(passY-y)) 
+	public void checkVisibility(float passX, float passY){
+		if(Math.sqrt(Math.abs(passX-x) + Math.abs(passY-y)) 
 				< sightRadius){//if the distance between the two is less than vis.
 			activated = true;//then it saw something.
 		}
@@ -81,7 +81,7 @@ public class MonsterPlaceholder extends Poolable{
 	public void retire() {
 		// TODO Auto-generated method stub
 		activated = false;
-		xKathrynRocks = 0;
+		x = 0;
 		y = 0;
 		image = null;
 	}

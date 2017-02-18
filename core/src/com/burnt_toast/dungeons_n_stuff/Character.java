@@ -7,8 +7,9 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Rectangle;
+import com.burnt_toast.monster_generator.Poolable;
 
-public abstract class Character {
+public abstract class Character extends Poolable{
 //used for the super class of archer and warrior and stuff. Just in case you forget.
 	protected float health;
 	protected float exp;
@@ -26,6 +27,7 @@ public abstract class Character {
 	protected float meleeSizeX;
 	protected float meleeSizeY;
 	protected TextureRegion[] frames;
+	private String temp;
 	
 	
 	protected Rectangle collisionRect;
@@ -41,13 +43,14 @@ public abstract class Character {
 	public Character(TextureRegion[] passedFrames){//i pass the frames for sizes
 		movementSpeed = 32;//32 pixels per second.
 		animationSpeed = 0.25f;//animates every fourth a second.
-		collisionRect = new Rectangle(0, 0, frames[1].getRegionWidth(), frames[1].getRegionHeight() / 2);
+		//it's having a problems with frames[1] here.
+		frames = passedFrames;
+		collisionRect = new Rectangle(0, 0, passedFrames[1].getRegionWidth(), passedFrames[1].getRegionHeight() / 2);
 		meleeRect = new Rectangle(0, 0, frames[1].getRegionWidth(), frames[1].getRegionHeight());
 		frameSizeX = frames[1].getRegionWidth();
 		frameSizeY = frames[1].getRegionHeight();
 		meleeSizeX = frames[2].getRegionWidth();
 		meleeSizeY = frames[2].getRegionHeight();
-		frames = passedFrames;
 		
 	}
 	
@@ -59,12 +62,21 @@ public abstract class Character {
 		if(passDirection == 'l')flipped = true;
 		else if (passDirection == 'r') flipped = false;
 	}
+	/**
+	 * 
+	 * @param passDirection
+	 */
+	public void move(char passDirection){
+		//System.out.println(str);
+		this.direction = passDirection;
+		move();
+	}
 	public void move(){
 		if(direction == 'u'){
 			//collision goes here.
 			if(!PlayScreen.checkCollisionAt(collisionRect.x, collisionRect.y + (movementSpeed* Gdx.graphics.getDeltaTime()),
 					collisionRect.getWidth(), collisionRect.getHeight())){//if no collision.
-				collisionRect.y += movementSpeed * Gdx.graphics.getDeltaTime();
+				this.collisionRect.y += this.movementSpeed * Gdx.graphics.getDeltaTime();
 				meleeRect.y = collisionRect.y + frameSizeY;
 				meleeRect.x = collisionRect.x;
 			}

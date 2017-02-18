@@ -8,6 +8,7 @@ public class Slime extends Monster{
 
 	public Slime() {
 		super(MainFrame.slimeFrames);
+		this.movementSpeed = 5;
 		// TODO Auto-generated constructor stub
 	}
 

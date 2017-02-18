@@ -1,5 +1,10 @@
 package com.burnt_toast.dungeons_n_stuff;
 
+import java.util.HashMap;
+import java.util.LinkedList;
+
+import org.omg.PortableInterceptor.ACTIVE;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
@@ -15,6 +20,7 @@ import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.burnt_toast.dungeons_n_stuff.monsters.Slime;
 
 public class PlayScreen implements Screen, InputProcessor{
 
@@ -37,6 +43,13 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	private float widthWithZoom;
 	private float heightWithZoom;
+	
+	private Slime testSlime;
+	private MonsterPlaceholder testPlaceholder;
+	
+	//HASH MAP STUFF
+	HashMap<Double, LinkedList<Character>> characterHash;
+	HashMap<Double, LinkedList<MonsterPlaceholder>> placeholderHash;
 	
 	//moving character drag stuff
 	float dragDifX;
@@ -81,7 +94,14 @@ public class PlayScreen implements Screen, InputProcessor{
 		//HUD
 		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 31, 6);
 		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 33, 8);
-
+		
+		testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 2,
+				4/*sight radius*/, MainFrame.slimeFrames[0]);
+		testSlime = new Slime();
+		//testSlime.setPosition(MainFrame.TILE_SIZE * 4, MainFrame.TILE_SIZE * 4);
+		
+		characterHash = new HashMap<Double, LinkedList<Character>>();
+		placeholderHash = new HashMap<Double, LinkedList<MonsterPlaceholder>>();
 	}
 	
 	
@@ -129,6 +149,14 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		playStage.getBatch().begin();
 		currentPlayer.draw((SpriteBatch)playStage.getBatch());
+		//draw the test slime
+		
+		if(testSlime.getIfInUse()){
+			testSlime.draw((SpriteBatch)playStage.getBatch());
+		}
+		else{
+			testPlaceholder.draw((SpriteBatch)playStage.getBatch());
+		}
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
 		main.gameFont.draw(playStage.getBatch(), "X : " + dragChangeX + "|Y: " + dragChangeY, 0, 0);
 		playStage.getBatch().end();
@@ -144,6 +172,15 @@ public class PlayScreen implements Screen, InputProcessor{
 		//INPUT
 		
 		//CALCULATE
+		if(testSlime.getIfInUse()){
+			testSlime.update(currentPlayer.getX(), currentPlayer.getY());
+		}
+		else{
+			testPlaceholder.checkVisibility(currentPlayer.getX(), currentPlayer.getY());
+		}
+		if(testPlaceholder.getIfActivated() && testSlime.getIfInUse() == false){
+			testSlime.toggleInUse();
+		}
 		widthWithZoom = playStage.getWidth() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 		heightWithZoom = playStage.getHeight() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 		currentPlayer.update();
@@ -229,9 +266,9 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	//check collision
 	public static boolean checkCollisionAt(float x, float y,float width, float height){
-		if(collisionMap[round(x, 8, false)/8][round(y,8, false)/8] == 1 |//bottom left corner
-				collisionMap[round(x, 8, false)/8][round(y + height, 8, false)/8] == 1 |//top left corner
-				collisionMap[round(x + width, 8, false)/8][round(y + height, 8, false)/8] == 1 |//top right corner
+		if(collisionMap[round(x, 8, false)/8][round(y,8, false)/8] == 1 ||//bottom left corner
+				collisionMap[round(x, 8, false)/8][round(y + height, 8, false)/8] == 1 ||//top left corner
+				collisionMap[round(x + width, 8, false)/8][round(y + height, 8, false)/8] == 1 ||//top right corner
 				collisionMap[round(x + width, 8, false)/8][round(y, 8, false)/8] == 1){
 			System.out.println("Collide in Check");
 			return true;}//bottom right corner. return true if collide
@@ -277,6 +314,17 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 
+	
+	//HASH MAP STUFF
+	public static <G extends Character> void hashCharacter(Character passChar){
+		/*
+		 * 
+		 */
+	}
+	
+	public static void hashPlaceholder(MonsterPlaceholder passMonst){
+		
+	}
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub

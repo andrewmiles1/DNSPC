@@ -23,11 +23,7 @@ public class Warrior extends Player{
 				MainFrame.warriorFrames[animationIndex].getRegionWidth()*-1:MainFrame.warriorFrames[animationIndex].getRegionWidth(),
 				MainFrame.warriorFrames[animationIndex].getRegionHeight());
 		if(attackTimer > 0 ){//if we're attacking
-			/*
-			batch.draw(MainFrame.warriorFrames[2],
-					meleeRect.x, meleeRect.y, MainFrame.warriorFrames[2].getRegionWidth()*-1,
-					MainFrame.warriorFrames[2].getRegionHeight());
-					*///THIS ONE ABOVE WORKS RIGHT, but the one below DOES NOT
+
 			
 			if(direction == 'r' || direction == 'l'){
 			batch.draw(MainFrame.warriorFrames[2],
