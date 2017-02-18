@@ -49,8 +49,10 @@ public abstract class Character extends Poolable{
 		meleeRect = new Rectangle(0, 0, frames[1].getRegionWidth(), frames[1].getRegionHeight());
 		frameSizeX = frames[1].getRegionWidth();
 		frameSizeY = frames[1].getRegionHeight();
-		meleeSizeX = frames[2].getRegionWidth();
-		meleeSizeY = frames[2].getRegionHeight();
+		if(frames[2] != null){
+			meleeSizeX = frames[2].getRegionWidth();
+			meleeSizeY = frames[2].getRegionHeight();
+		}
 		
 	}
 	

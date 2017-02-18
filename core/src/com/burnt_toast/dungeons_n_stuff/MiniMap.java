@@ -12,6 +12,10 @@ public class MiniMap {
 	TextureRegion seenTilePic;
 	TextureRegion unseenTilePic;
 	TextureRegion youAreHerePic;
+	TextureRegion darkPixel;
+	TextureRegion halfVisA;
+	TextureRegion halfVisB;
+	String[][] visMapVars;
 	
 	private Vector2 playerXnY;
 	
@@ -23,11 +27,12 @@ public class MiniMap {
 	float miniTileSize;
 	float mapAlphaLevel;
 	
-	public MiniMap(TextureRegion passSeenPixel, TextureRegion passUnseenPixel, TextureRegion youAreHerePixel,
+	public MiniMap(TextureRegion passSeenPixel, TextureRegion passUnseenPixel, TextureRegion youAreHerePixel, TextureRegion passDarkPixel,
 			float passMidOfScreenX, float passMidOfScreenY){
 		seenTilePic = passSeenPixel;
 		unseenTilePic = passUnseenPixel;
 		youAreHerePic = youAreHerePixel;
+		darkPixel = passDarkPixel;
 		midOfScreenY = passMidOfScreenY;
 		midOfScreenX = passMidOfScreenX;
 		//if map is below a certain size, 5 pixels is a good size
@@ -56,7 +61,16 @@ public class MiniMap {
 		textMap = newTextMap;
 		visibilityMap = newTextMap;
 		visibilityMap[1][1] = 9;
+		visMapVars = new String[visibilityMap.length][visibilityMap.length];//size of map, it's a box so they're equal
+		initializeVisMapVars();
 		}
+	private void initializeVisMapVars(){
+		for(int i = 0; i < visMapVars.length; i++){
+			for(int k = 0; k < visMapVars.length; k++){
+				visMapVars[i][k] = "0000";
+			}
+		}
+	}
 	public void setMapAlphaLevel(float passAlphaLevel){
 		mapAlphaLevel = passAlphaLevel;
 	}
@@ -140,6 +154,7 @@ public class MiniMap {
 		for(int i = visibilityMap.length-1; i >= 0; i--){
 			for(int k = 0; k < visibilityMap[0].length; k++){
 				if(visibilityMap[i][k] == 0){//unseen floor
+					/*
 					if(i == visibilityMap.length - 1){//if on top
 						batch.draw(this.unseenTilePic,
 								i * MainFrame.TILE_SIZE + MainFrame.TILE_SIZE,//just one above the tile
@@ -152,6 +167,11 @@ public class MiniMap {
 								k * MainFrame.TILE_SIZE - MainFrame.TILE_SIZE,//just one to left of tile
 								MainFrame.TILE_SIZE * 1, MainFrame.TILE_SIZE * 3);//left bar to hide walls
 					}
+					*/
+					batch.draw(this.darkPixel,
+							MainFrame.TILE_SIZE * i * 3,
+							MainFrame.TILE_SIZE * k * 3,
+							MainFrame.TILE_SIZE * 3, MainFrame.TILE_SIZE * 3);
 				}
 			}
 		}

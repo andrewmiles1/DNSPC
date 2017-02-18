@@ -77,6 +77,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		miniMap = new MiniMap(new TextureRegion(main.mainTileset, 65, 34, 1, 1), //seen
 				new TextureRegion(main.mainTileset, 65, 32, 1, 1),//unseen
 				new TextureRegion(main.mainTileset, 64, 34, 1, 1),//you are here
+				new TextureRegion(main.mainTileset, 0, 0, 1, 1),
 				hudStage.getWidth()/2, hudStage.getHeight()/2);
 		collisionMap = new int[50][50];
 		
@@ -98,7 +99,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 2,
 				4/*sight radius*/, MainFrame.slimeFrames[0]);
 		testSlime = new Slime();
-		//testSlime.setPosition(MainFrame.TILE_SIZE * 4, MainFrame.TILE_SIZE * 4);
+		testSlime.setPosition(MainFrame.TILE_SIZE * 4, MainFrame.TILE_SIZE * 4);
 		
 		characterHash = new HashMap<Double, LinkedList<Character>>();
 		placeholderHash = new HashMap<Double, LinkedList<MonsterPlaceholder>>();
