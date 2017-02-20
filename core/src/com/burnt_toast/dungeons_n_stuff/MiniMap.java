@@ -154,27 +154,52 @@ public class MiniMap {
 		for(int i = visibilityMap.length-1; i >= 0; i--){
 			for(int k = 0; k < visibilityMap[0].length; k++){
 				if(visibilityMap[i][k] == 0){//unseen floor
-					/*
-					if(i == visibilityMap.length - 1){//if on top
-						batch.draw(this.unseenTilePic,
-								i * MainFrame.TILE_SIZE + MainFrame.TILE_SIZE,//just one above the tile
-								k * MainFrame.TILE_SIZE,
-								MainFrame.TILE_SIZE * 3, MainFrame.TILE_SIZE * 1);//top bar to hide walls
-					}//end if on top
-					if(k == 1){//if on left of stuff
-						batch.draw(this.unseenTilePic,
-								i * MainFrame.TILE_SIZE,
-								k * MainFrame.TILE_SIZE - MainFrame.TILE_SIZE,//just one to left of tile
-								MainFrame.TILE_SIZE * 1, MainFrame.TILE_SIZE * 3);//left bar to hide walls
-					}
-					*/
 					batch.draw(this.darkPixel,
 							MainFrame.TILE_SIZE * i * 3,
 							MainFrame.TILE_SIZE * k * 3,
 							MainFrame.TILE_SIZE * 3, MainFrame.TILE_SIZE * 3);
-				}
-			}
-		}
+					if(visibilityMap[i-1][k] == 1){//if left is a wall
+						batch.draw(this.darkPixel,
+								MainFrame.TILE_SIZE * i * 3 - MainFrame.TILE_SIZE,
+								MainFrame.TILE_SIZE * k * 3,
+								MainFrame.TILE_SIZE, MainFrame.TILE_SIZE * 3);
+					}//end if left is wall*/
+					if(visibilityMap[i][k+1] == 1){//if up is wall
+						batch.draw(this.darkPixel,
+								MainFrame.TILE_SIZE * i * 3 - 4,
+								MainFrame.TILE_SIZE * k * 3 + MainFrame.TILE_SIZE*3,
+								MainFrame.TILE_SIZE * 3 + 8, MainFrame.TILE_SIZE+4);
+					}//end if up is wall
+					if(visibilityMap[i+1][k] == 1){//if right is wall
+						batch.draw(this.darkPixel,
+								MainFrame.TILE_SIZE * i * 3 + MainFrame.TILE_SIZE*3,
+								MainFrame.TILE_SIZE * k * 3,
+								MainFrame.TILE_SIZE, MainFrame.TILE_SIZE * 3);
+					}//end if right is wall
+					if(visibilityMap[i][k-1] == 1){//if down is wall
+						batch.draw(this.darkPixel,
+								MainFrame.TILE_SIZE * i * 3,
+								MainFrame.TILE_SIZE * k * 3 - MainFrame.TILE_SIZE,
+								MainFrame.TILE_SIZE * 3, MainFrame.TILE_SIZE);
+						if(visibilityMap[i-1][k] == 1){//if down and left
+							batch.draw(this.darkPixel,
+									MainFrame.TILE_SIZE * i * 3 - 3,
+									MainFrame.TILE_SIZE * k * 3 - 3, 
+									3, 3);
+						}
+						if(visibilityMap[i+1][k] == 1){//if down and right is wall
+							batch.draw(this.darkPixel,
+									MainFrame.TILE_SIZE * (i+1) * 3,
+									MainFrame.TILE_SIZE * k * 3 - 3, 
+									3, 3);
+						}
+					}//end if down is wall*/
+				}//end if unseen floor
+	
+
+
+			}//end k for looop
+		}//end i for looooooooop
 	}
 	
 	public void draw(SpriteBatch batch){

@@ -271,7 +271,6 @@ public class PlayScreen implements Screen, InputProcessor{
 				collisionMap[round(x, 8, false)/8][round(y + height, 8, false)/8] == 1 ||//top left corner
 				collisionMap[round(x + width, 8, false)/8][round(y + height, 8, false)/8] == 1 ||//top right corner
 				collisionMap[round(x + width, 8, false)/8][round(y, 8, false)/8] == 1){
-			System.out.println("Collide in Check");
 			return true;}//bottom right corner. return true if collide
 		else{return false;}
 	}
