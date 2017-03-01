@@ -17,6 +17,8 @@ public class Monster extends Character{
 	protected char direction;
 	protected float attackTimer;
 	protected float animationTimer;
+	protected float patienceTime;//the default of when it will give up.
+	protected float giveUpTimer; //the amount of time this goes back to being a placeholder
 	@Override
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
@@ -34,10 +36,21 @@ public class Monster extends Character{
 		// TODO Auto-generated method stub
 		
 	}
-	public void update(float playerX, float playerY){
+	public void setGiveUpTime(float passPatience){
+		patienceTime = passPatience;
+		giveUpTimer = passPatience;
+	}
+	public boolean update(float playerX, float playerY){
 		move(playerX, playerY);
+		if(giveUpTimer > 0){
+			giveUpTimer -= Gdx.graphics.getDeltaTime();
+		}
+		else{
+			giveUpTimer = patienceTime;
+			return true;
+		}
 		update();
-		
+		return false;
 	}
 	public void move(float playerX, float playerY){
 		if(playerX < this.getX()){

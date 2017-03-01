@@ -6,6 +6,7 @@ import java.util.LinkedList;
 import org.omg.PortableInterceptor.ACTIVE;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -364,13 +365,24 @@ public class PlayScreen implements Screen, InputProcessor{
 	public boolean keyUp(int keycode) {
 		// TODO Auto-generated method stub
 		if(keycode == Keys.A ||keycode == Keys.S || keycode == Keys.D || keycode == Keys.W){
-			if(!Gdx.input.isButtonPressed(Keys.A) &&
-			!Gdx.input.isButtonPressed(Keys.S) &&
-			!Gdx.input.isButtonPressed(Keys.D) &&
-			!Gdx.input.isButtonPressed(Keys.W)){
+			if(!Gdx.input.isKeyPressed(Keys.A) &&
+			!Gdx.input.isKeyPressed(Keys.S) &&
+			!Gdx.input.isKeyPressed(Keys.D) &&
+			!Gdx.input.isKeyPressed(Keys.W)){
 				currentPlayer.setIfMoving(false);
 			}
-
+			if(Gdx.input.isKeyPressed(Keys.A)){
+				currentPlayer.setDirection('l');
+			}
+			else if(Gdx.input.isKeyPressed(Keys.W)){
+				currentPlayer.setDirection('u');
+			}
+			else if(Gdx.input.isKeyPressed(Keys.S)){
+				currentPlayer.setDirection('d');
+			}
+			else if(Gdx.input.isKeyPressed(Keys.D)){
+				currentPlayer.setDirection('r');
+			}
 		}
 		return false;
 	}
