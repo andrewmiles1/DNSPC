@@ -8,7 +8,9 @@ public class Warrior extends Player{
 	public Warrior() {
 		super(MainFrame.warriorFrames);
 		this.attackMaxTime = 0.25f;
-		
+		this.meeleeDamage = new float[2];
+		this.meeleeDamage[0] = 1;
+		this.meeleeDamage[1] = 2;
 		// TODO Auto-generated constructor stub
 	}
 
@@ -42,14 +44,19 @@ public class Warrior extends Player{
 					//(direction == 'u')?if flipped y
 					MainFrame.warriorFrames[2].getRegionHeight()*-1, 1, 1, 90);
 			}//emd else
+
 			
 		}
+		//this 2 line of code shows where the melee rect is at 
+		//batch.draw(MainFrame.silverFrame, meleeRect.x, meleeRect.y, meleeRect.getWidth(),
+				//meleeRect.getHeight());
 	}
 
 	@Override
 	public void attack() {
 		// TODO Auto-generated method stub
 		this.attackTimer = this.attackMaxTime;
+		super.attack();
 	}
 
 }

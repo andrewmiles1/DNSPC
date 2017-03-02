@@ -35,7 +35,9 @@ public class PlayScreen implements Screen, InputProcessor{
 	private Stage hudStage;
 	private OrthographicCamera orthoCam;
 	private boolean pause;
+	private static float temp;
 	
+	private static int floorLevel;
 	private TiledMapTileLayer map;
 	//hud
 	private TextureRegion healthBar;
@@ -49,8 +51,8 @@ public class PlayScreen implements Screen, InputProcessor{
 	private MonsterPlaceholder testPlaceholder;
 	
 	//HASH MAP STUFF
-	HashMap<Double, LinkedList<Character>> characterHash;
-	HashMap<Double, LinkedList<MonsterPlaceholder>> placeholderHash;
+	static HashMap<Float, LinkedList<Character>> characterHash;
+	HashMap<Float, LinkedList<MonsterPlaceholder>> placeholderHash;
 	
 	//moving character drag stuff
 	float dragDifX;
@@ -97,13 +99,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 31, 6);
 		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 33, 8);
 		
-		testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 2,
-				4/*sight radius*/, MainFrame.slimeFrames[0]);
+		testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 4,
+				3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0]);
 		testSlime = new Slime();
 		testSlime.setPosition(MainFrame.TILE_SIZE * 4, MainFrame.TILE_SIZE * 4);
 		
-		characterHash = new HashMap<Double, LinkedList<Character>>();
-		placeholderHash = new HashMap<Double, LinkedList<MonsterPlaceholder>>();
+		characterHash = new HashMap<Float, LinkedList<Character>>();
+		placeholderHash = new HashMap<Float, LinkedList<MonsterPlaceholder>>();
 	}
 	
 	
@@ -174,6 +176,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		//INPUT
 		
 		//CALCULATE
+		//clear hash
+		this.clearHash();
+		//rehash everything
+		this.hashCharacter(testSlime);
+		this.hashCharacter(currentPlayer);
+		
+		
 		if(testSlime.getIfInUse()){
 			testSlime.update(currentPlayer.getX(), currentPlayer.getY());
 		}
@@ -228,9 +237,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 	}
 
-	public static float hash(int x, int y){
-		return (float) (x * Math.sqrt(y));
-	}
+
 	public void loadMap(){//mapWidth = menuMap.getProperties().get("width" , Integer.class)
 		//load collision:
 		for(int i = 0; i < 49;i++){
@@ -261,6 +268,7 @@ public class PlayScreen implements Screen, InputProcessor{
 
 		this.collisionMap = mapTool.prepareMap(10);
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
+		floorLevel = 1;
 	}//end load map
 	public void buttonCode(String buttonName){
 		
@@ -315,15 +323,42 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 
-	
+	public static int getCurrentLevel(){
+		return floorLevel;
+	}
 	//HASH MAP STUFF
-	public static <G extends Character> void hashCharacter(Character passChar){
-		/*
-		 * 
-		 */
+	public static LinkedList<Character> getCharactersAt(float x, float y){
+		temp = hash(x, y);
+		if(!characterHash.containsKey(temp)){
+			return null;
+		}
+		return characterHash.get(temp);
+	}
+	public static float hash(float x, float y){
+		return (float) ((int)(MainFrame.TILE_SIZE) * Math.sqrt((int)(y/MainFrame.TILE_SIZE)));
+	}
+	public void clearHash(){
+		for(Float key: characterHash.keySet()){
+			characterHash.get(key).clear();
+		}
+	}
+	public <G extends Character> void hashCharacter(Character passChar){
+		//bottom right corner
+		temp = hash(passChar.getX(), passChar.getY()); //get hash key
+		if(!this.characterHash.containsKey(temp)){//if list doesn't exist
+			characterHash.put(temp, new LinkedList<Character>());//make it
+		}
+		characterHash.get(temp).add(passChar);//add character to hash
+		//top right corner next
+		temp = hash(passChar.getX() + passChar.getRectangle().width,
+				passChar.getY() + passChar.getRectangle().width);
+		if(!this.characterHash.containsKey(temp)){
+			characterHash.put(temp, new LinkedList<Character>());
+		}
+		characterHash.get(temp).add(passChar);
 	}
 	
-	public static void hashPlaceholder(MonsterPlaceholder passMonst){
+	public void hashPlaceholder(MonsterPlaceholder passMonst){
 		
 	}
 	@Override

@@ -9,7 +9,15 @@ public class Slime extends Monster{
 	public Slime() {
 		super(MainFrame.slimeFrames);
 		this.movementSpeed = 5;
+		this.health = 2;
 		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public float calcHealth() {
+		// TODO Auto-generated method stub
+		
+		return 3;
 	}
 
 }

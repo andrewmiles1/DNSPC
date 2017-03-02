@@ -5,7 +5,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.burnt_toast.monster_generator.Poolable;
 
-public class Monster extends Character{
+public abstract class Monster extends Character{
 	public Monster(TextureRegion[] passFrames) {
 		super(passFrames);
 		this.isMoving = true;
@@ -36,11 +36,19 @@ public class Monster extends Character{
 		// TODO Auto-generated method stub
 		
 	}
+<<<<<<< Updated upstream
 	public void setGiveUpTime(float passPatience){
 		patienceTime = passPatience;
 		giveUpTimer = passPatience;
 	}
 	public boolean update(float playerX, float playerY){
+=======
+	public void update(float playerX, float playerY){
+		if(this.health <=0){
+			//retire object
+			this.inUse = false;
+		}
+>>>>>>> Stashed changes
 		move(playerX, playerY);
 		if(giveUpTimer > 0){
 			giveUpTimer -= Gdx.graphics.getDeltaTime();
@@ -74,15 +82,22 @@ public class Monster extends Character{
 		//collision and stuff math
 		
 	}
+	/**
+	 * calculates the health for the current level of floor and such.
+	 * @return
+	 */
+	public abstract float calcHealth();
 	@Override
 	public void reset() {
 		// TODO Auto-generated method stub
-		
+		this.inUse = true;
+		this.health = this.calcHealth();
+		//set all the waling speed and stuff based off floor level
 	}
 	@Override
 	public void retire() {
 		// TODO Auto-generated method stub
-		
+		this.inUse = false;
 	}
 	
 

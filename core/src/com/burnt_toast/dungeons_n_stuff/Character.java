@@ -87,7 +87,7 @@ public abstract class Character extends Poolable{
 			if(!PlayScreen.checkCollisionAt(collisionRect.x, collisionRect.y - (movementSpeed* Gdx.graphics.getDeltaTime()),
 					collisionRect.getWidth(), collisionRect.getHeight())){//if no collision.
 				collisionRect.y -= movementSpeed * Gdx.graphics.getDeltaTime();
-				meleeRect.y = collisionRect.y - meleeSizeY;//places below character, subtract meelee not just frame size
+				meleeRect.y = collisionRect.y - meleeRect.height;//places below character, subtract meelee not just frame size
 				meleeRect.x = collisionRect.x;
 			}
 		}
@@ -103,7 +103,7 @@ public abstract class Character extends Poolable{
 			if(!PlayScreen.checkCollisionAt(collisionRect.x - (movementSpeed* Gdx.graphics.getDeltaTime()), collisionRect.y,
 					collisionRect.getWidth(), collisionRect.getHeight())){//if no collision.
 				collisionRect.x -= movementSpeed * Gdx.graphics.getDeltaTime();
-				meleeRect.x = collisionRect.x - meleeSizeX;//sets to left, so subtract melee size
+				meleeRect.x = collisionRect.x - meleeRect.width;//sets to left, so subtract melee size
 				meleeRect.y = collisionRect.y;
 			}
 		}
@@ -124,9 +124,23 @@ public abstract class Character extends Poolable{
 		}
 	}
 	
-	public abstract void attack();
+	public void attack(){
+		if(PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y) != null){
+			for(Character tempChar: PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y)){
+				if(tempChar.getRectangle().overlaps(this.meleeRect))
+				tempChar.hit((int)Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]));
+			}
+		}
+		if(PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y + meleeRect.y) != null){
+			for(Character tempChar: PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y + meleeRect.y)){
+				if(tempChar.getRectangle().overlaps(this.meleeRect))
+				tempChar.hit((int)Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]));
+			}
+		}
+		
+	}
 	
-	public void hit(float damage){health -= damage;}
+	public void hit(float damage){health -= damage;System.out.println("HIT" + this.health);}
 	public void heal(float amount){health += amount;}
 	public void expPickup(float expAmount){
 		if(exp + expAmount >= nextLevelExp){
@@ -147,6 +161,8 @@ public abstract class Character extends Poolable{
 	}
 	public float getX(){return collisionRect.x;}
 	public float getY(){return collisionRect.y;}
-	
+	public Rectangle getRectangle(){
+		return this.collisionRect;
+	}
 	
 }
