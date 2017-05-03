@@ -81,7 +81,8 @@ public abstract class Character extends Poolable{
 		if(direction == 'u'){
 			//collision goes here.
 			if(!PlayScreen.checkCollisionAt(collisionRect.x, collisionRect.y + (movementSpeed* Gdx.graphics.getDeltaTime()),
-					collisionRect.getWidth(), collisionRect.getHeight())){//if no collision.
+					collisionRect.getWidth(), collisionRect.getHeight()) && 
+					){//if no collision.
 				this.collisionRect.y += this.movementSpeed * Gdx.graphics.getDeltaTime();
 				meleeRect.y = collisionRect.y + frameSizeY;
 				meleeRect.x = collisionRect.x;

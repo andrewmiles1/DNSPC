@@ -14,6 +14,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -33,6 +34,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private OrthographicCamera orthoCam;
 	private boolean pause;
 	private static float temp;
+	private static Rectangle tempRect;
 	
 	private static int floorLevel;
 	private TiledMapTileLayer map;
@@ -45,7 +47,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private float heightWithZoom;
 	
 	//MONSTER STUFF
-	private LinkedList<Slime> activeSlimes;
+	private static LinkedList<Slime> activeSlimes;
 	private Pool<Slime> slimePool;
 	private LinkedList<MonsterPlaceholder> activePlaceholders;
 	private Pool<MonsterPlaceholder> placeholderPool;
@@ -67,7 +69,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	private Vector2 touchCoordsTemp;
 	
-	private Player currentPlayer;
+	private static Player currentPlayer;
 	
 	public PlayScreen(MainFrame passedMain){
 		main = passedMain;
@@ -107,6 +109,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		placeholderPool = new Pool<MonsterPlaceholder>();
 		activeSlimes = new LinkedList<Slime>();
 		slimePool = new Pool<Slime>();
+		tempRect = new Rectangle();
 		
 		characterHash = new HashMap<Float, LinkedList<Character>>();
 		placeholderHash = new HashMap<Float, LinkedList<MonsterPlaceholder>>();
@@ -396,6 +399,23 @@ public class PlayScreen implements Screen, InputProcessor{
 	public void hashPlaceholder(MonsterPlaceholder passMonst){
 		
 	}
+	
+	public static boolean checkCharacterCollision(float x, float y, Rectangle rect){
+		tempRect.width = rect.width;
+		tempRect.height = rect.height;
+		tempRect.x = x;
+		tempRect.y = y;
+		for(Slime sl: activeSlimes){
+			if(sl.getRectangle().overlaps(tempRect)){
+				return true;
+			}
+		}
+		if(currentPlayer.getRectangle().overlaps(rect)){
+			return true;
+		}
+		return false;
+	}
+	
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
