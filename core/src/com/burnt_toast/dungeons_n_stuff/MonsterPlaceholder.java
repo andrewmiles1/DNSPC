@@ -3,18 +3,26 @@ package com.burnt_toast.dungeons_n_stuff;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector3;
+import com.burnt_toast.dungeons_n_stuff.monsters.Slime;
+import com.burnt_toast.monster_generator.Pool;
 import com.burnt_toast.monster_generator.Poolable;
 
 public class MonsterPlaceholder extends Poolable{
 	private float x;
 	private float y;
+	private float health;
 	private float sightRadius;
 	private TextureRegion image;
 	private boolean activated;
 	private Vector3 tempRect;
+	private MonsType myType;
+	
+	public enum MonsType{SLIME, WIZARD}
+	
 	
 	public MonsterPlaceholder(float passX, float passY,
-			float passSightRadius, TextureRegion passImage){
+			float passSightRadius, TextureRegion passImage, Pool<MonsterPlaceholder> parentPool){
+		super(parentPool);
 		image = passImage;
 		sightRadius = passSightRadius;
 		x = passX;
@@ -23,9 +31,11 @@ public class MonsterPlaceholder extends Poolable{
 		
 	}
 	
-	public MonsterPlaceholder(){
-		this(0, 0, 0, null);
-		//doesn't need to set activated, it's set in the other constructor
+	public void copyInfo(Slime sl){
+		sl.setX(this.getX());
+		sl.setY(this.getY());
+		if(health != 0)
+			sl.setHealth(this.health);
 	}
 	
 	public void setX(float passX){
@@ -37,6 +47,9 @@ public class MonsterPlaceholder extends Poolable{
 	}
 	public float getX(){
 		return x;
+	}
+	public float getY(){
+		return y;
 	}
 	public void setIfActivated(boolean passActive){
 		activated = passActive;
@@ -53,6 +66,7 @@ public class MonsterPlaceholder extends Poolable{
 	public void draw(SpriteBatch batch){
 		batch.draw(image, x,  y);
 	}
+	//wow am I glad I commented what I use that for because I had absolutely no idea.
 	/**
 	 * This method is used primarily for hashing the visibilty
 	 * of the monster
@@ -65,10 +79,17 @@ public class MonsterPlaceholder extends Poolable{
 		return tempRect;
 	}
 	public void checkVisibility(float passX, float passY){
-		if(Math.sqrt(Math.abs(passX-x) + Math.abs(passY-y)) 
+		if(Math.sqrt(Math.pow(Math.abs(passX-x), 2) + Math.pow(Math.abs(passY-y), 2)) 
 				< sightRadius){//if the distance between the two is less than vis.
 			activated = true;//then it saw something.
 		}
+	}
+	
+	public MonsType getMonsType(){
+		return myType;
+	}
+	public void setMonsType(MonsType passType){
+		myType = passType;
 	}
 
 	@Override
@@ -85,6 +106,8 @@ public class MonsterPlaceholder extends Poolable{
 		y = 0;
 		image = null;
 	}
+
+	
 	
 	
 }

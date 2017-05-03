@@ -1,17 +1,14 @@
 package com.burnt_toast.dungeons_n_stuff;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.burnt_toast.monster_generator.Pool;
 import com.burnt_toast.monster_generator.Poolable;
 
 public abstract class Monster extends Character{
-	public Monster(TextureRegion[] passFrames) {
-		super(passFrames);
-		this.isMoving = true;
-		// TODO Auto-generated constructor stub
-	}
-	protected float health;
+
 	protected int level;
 	protected float meleeDamage;
 	protected char direction;
@@ -19,9 +16,28 @@ public abstract class Monster extends Character{
 	protected float animationTimer;
 	protected float patienceTime;//the default of when it will give up.
 	protected float giveUpTimer; //the amount of time this goes back to being a placeholder
+	protected float hitPause;
+	protected float hitPauseTimer;
+	@SuppressWarnings("rawtypes")
+	protected Pool parentPool;
+	
+	
+	@SuppressWarnings("rawtypes")
+	public Monster(TextureRegion[] passFrames, Pool parentPool) {
+		super(passFrames);
+		this.isMoving = true;
+		this.parentPool = parentPool;
+		hitPause = 0.25f;
+		// TODO Auto-generated constructor stub
+	}
+	
+	
 	@Override
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
+		if(hitPauseTimer > 0){
+			batch.setColor(150, 150, 150, 100);
+		}
 		if(flipped == true){
 			batch.draw(this.frames[this.animationIndex], this.getX(), this.getY(),
 					this.frameSizeX * -1, this.frameSizeY);
@@ -30,26 +46,33 @@ public abstract class Monster extends Character{
 			batch.draw(this.frames[this.animationIndex], this.getX(), this.getY(),
 					this.frameSizeX, this.frameSizeY);
 		}
+		batch.setColor(Color.WHITE);
+		
 	}
 	@Override
 	public void attack() {
 		// TODO Auto-generated method stub
 		
 	}
-<<<<<<< Updated upstream
+
 	public void setGiveUpTime(float passPatience){
 		patienceTime = passPatience;
 		giveUpTimer = passPatience;
 	}
 	public boolean update(float playerX, float playerY){
-=======
-	public void update(float playerX, float playerY){
+
 		if(this.health <=0){
 			//retire object
-			this.inUse = false;
+			System.out.println("I'm dead.");
+			this.toggleInUse();
 		}
->>>>>>> Stashed changes
-		move(playerX, playerY);
+		if(hitPauseTimer > 0){
+			hitPauseTimer -= Gdx.graphics.getDeltaTime();
+		}
+		if(hitPauseTimer <= 0){
+			move(playerX, playerY);
+			update();
+		}
 		if(giveUpTimer > 0){
 			giveUpTimer -= Gdx.graphics.getDeltaTime();
 		}
@@ -57,7 +80,7 @@ public abstract class Monster extends Character{
 			giveUpTimer = patienceTime;
 			return true;
 		}
-		update();
+
 		return false;
 	}
 	public void move(float playerX, float playerY){
@@ -82,6 +105,13 @@ public abstract class Monster extends Character{
 		//collision and stuff math
 		
 	}
+	
+	@Override
+	public void hit(float damage){
+		super.hit(damage);
+		this.hitPauseTimer = hitPause;
+	}
+	
 	/**
 	 * calculates the health for the current level of floor and such.
 	 * @return
@@ -99,6 +129,7 @@ public abstract class Monster extends Character{
 		// TODO Auto-generated method stub
 		this.inUse = false;
 	}
+	
 	
 
 }

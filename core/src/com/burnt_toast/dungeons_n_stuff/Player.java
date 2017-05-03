@@ -39,5 +39,8 @@ public class Player extends Character{
 		// TODO Auto-generated method stub
 		
 	}
+	public float getMovementSpeed(){
+		return this.movementSpeed;
+	}
 	
 }

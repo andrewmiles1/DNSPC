@@ -15,7 +15,7 @@ public abstract class Character extends Poolable{
 	protected float exp;
 	protected int level;
 	protected float nextLevelExp;
-	protected float meeleePause;
+	protected float meeleePause; 
 	protected float[] meeleeDamage;//range of 2 numbers
 	protected float[] rangedDamage;//range of 2 numbers
 	protected boolean isMoving;
@@ -41,6 +41,7 @@ public abstract class Character extends Poolable{
 	protected float animationTimer;
 	
 	public Character(TextureRegion[] passedFrames){//i pass the frames for sizes
+		super(null);//this is needed because of the poolable thing. Even though not all characters are POOLABLE ANDREW.
 		movementSpeed = 32;//32 pixels per second.
 		animationSpeed = 0.25f;//animates every fourth a second.
 		//it's having a problems with frames[1] here.
@@ -60,6 +61,9 @@ public abstract class Character extends Poolable{
 	public boolean getIfMoving(){return isMoving;}
 	public char getDirection(){return direction;}
 	public void setDirection(char passDirection){
+		if(direction != passDirection){
+			attackTimer = 0;
+		}
 		direction = passDirection;
 		if(passDirection == 'l')flipped = true;
 		else if (passDirection == 'r') flipped = false;
@@ -128,19 +132,19 @@ public abstract class Character extends Poolable{
 		if(PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y) != null){
 			for(Character tempChar: PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y)){
 				if(tempChar.getRectangle().overlaps(this.meleeRect))
-				tempChar.hit((int)Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]));
+				tempChar.hit((int)(Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]))+1);
 			}
 		}
 		if(PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y + meleeRect.y) != null){
 			for(Character tempChar: PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y + meleeRect.y)){
 				if(tempChar.getRectangle().overlaps(this.meleeRect))
-				tempChar.hit((int)Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]));
+				tempChar.hit((int)(Math.random()*((this.meeleeDamage[1]-meeleeDamage[0]+1)+meeleeDamage[0]))+1);
 			}
 		}
 		
 	}
 	
-	public void hit(float damage){health -= damage;System.out.println("HIT" + this.health);}
+	public void hit(float damage){health -= damage;System.out.println("HIT" + damage);}
 	public void heal(float amount){health += amount;}
 	public void expPickup(float expAmount){
 		if(exp + expAmount >= nextLevelExp){
@@ -161,6 +165,15 @@ public abstract class Character extends Poolable{
 	}
 	public float getX(){return collisionRect.x;}
 	public float getY(){return collisionRect.y;}
+	public void setX(float x){
+		this.collisionRect.setX(x);
+	}
+	public void setY(float y){
+		this.collisionRect.setY(y);
+	}
+	public void setHealth(float health){
+		this.health = health;
+	}
 	public Rectangle getRectangle(){
 		return this.collisionRect;
 	}

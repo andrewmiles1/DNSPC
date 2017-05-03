@@ -3,10 +3,7 @@ package com.burnt_toast.dungeons_n_stuff;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-import org.omg.PortableInterceptor.ACTIVE;
-
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input.Buttons;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -16,12 +13,12 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.burnt_toast.dungeons_n_stuff.monsters.Slime;
+import com.burnt_toast.monster_generator.Pool;
 
 public class PlayScreen implements Screen, InputProcessor{
 
@@ -47,7 +44,11 @@ public class PlayScreen implements Screen, InputProcessor{
 	private float widthWithZoom;
 	private float heightWithZoom;
 	
-	private Slime testSlime;
+	//MONSTER STUFF
+	private LinkedList<Slime> activeSlimes;
+	private Pool<Slime> slimePool;
+	private LinkedList<MonsterPlaceholder> activePlaceholders;
+	private Pool<MonsterPlaceholder> placeholderPool;
 	private MonsterPlaceholder testPlaceholder;
 	
 	//HASH MAP STUFF
@@ -66,7 +67,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	private Vector2 touchCoordsTemp;
 	
-	private Character currentPlayer;
+	private Player currentPlayer;
 	
 	public PlayScreen(MainFrame passedMain){
 		main = passedMain;
@@ -99,10 +100,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 31, 6);
 		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 33, 8);
 		
-		testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 4,
-				3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0]);
-		testSlime = new Slime();
-		testSlime.setPosition(MainFrame.TILE_SIZE * 4, MainFrame.TILE_SIZE * 4);
+		//Monster Generator
+		//testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 4,
+		//		3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0]);
+		activePlaceholders = new LinkedList<MonsterPlaceholder>();
+		placeholderPool = new Pool<MonsterPlaceholder>();
+		activeSlimes = new LinkedList<Slime>();
+		slimePool = new Pool<Slime>();
 		
 		characterHash = new HashMap<Float, LinkedList<Character>>();
 		placeholderHash = new HashMap<Float, LinkedList<MonsterPlaceholder>>();
@@ -123,7 +127,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		main.addInputProcessor(this);
 		loadMap();
 		miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
-		miniMap.activateBlock(1, 1);
+		miniMap.activateBlock(1, 1, this);
 	}
 
 	@Override
@@ -155,12 +159,14 @@ public class PlayScreen implements Screen, InputProcessor{
 		currentPlayer.draw((SpriteBatch)playStage.getBatch());
 		//draw the test slime
 		
-		if(testSlime.getIfInUse()){
-			testSlime.draw((SpriteBatch)playStage.getBatch());
+		for(Slime sl: activeSlimes){
+			sl.draw((SpriteBatch)playStage.getBatch());
 		}
-		else{
-			testPlaceholder.draw((SpriteBatch)playStage.getBatch());
+		for(MonsterPlaceholder m: activePlaceholders){
+			if(m!= null)
+			m.draw((SpriteBatch)playStage.getBatch());
 		}
+
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
 		main.gameFont.draw(playStage.getBatch(), "X : " + dragChangeX + "|Y: " + dragChangeY, 0, 0);
 		playStage.getBatch().end();
@@ -179,18 +185,37 @@ public class PlayScreen implements Screen, InputProcessor{
 		//clear hash
 		this.clearHash();
 		//rehash everything
-		this.hashCharacter(testSlime);
+		for(Slime sl: activeSlimes){
+			hashCharacter(sl);
+		}
 		this.hashCharacter(currentPlayer);
 		
-		
-		if(testSlime.getIfInUse()){
-			testSlime.update(currentPlayer.getX(), currentPlayer.getY());
+		for(int i = 0; i < activeSlimes.size(); i++){
+			activeSlimes.get(i).update(currentPlayer.getX(), currentPlayer.getY());
+			if(!activeSlimes.get(i).getIfInUse()){
+				activeSlimes.get(i).retire();
+				activeSlimes.remove(i);
+			}
 		}
-		else{
-			testPlaceholder.checkVisibility(currentPlayer.getX(), currentPlayer.getY());
+		for(MonsterPlaceholder m: activePlaceholders){
+			m.checkVisibility(currentPlayer.getX(), currentPlayer.getY());
 		}
-		if(testPlaceholder.getIfActivated() && testSlime.getIfInUse() == false){
-			testSlime.toggleInUse();
+		for(int i = 0; i < activePlaceholders.size(); i++){
+			if(activePlaceholders.get(i).getIfActivated()){
+				//remove the placholder from the linked list here
+				activePlaceholders.get(i).toggleInUse();
+				this.activeSlimes.add(slimePool.getObject());
+				if(activeSlimes.getLast() == null){//if there were none in the pool
+					System.out.println("Yeah");
+					activeSlimes.removeLast();
+					activeSlimes.add(new Slime(slimePool));
+				}//end if slime is null
+				activeSlimes.getLast().calcHealth();
+				activeSlimes.getLast().toggleInUse();
+				activePlaceholders.get(i).copyInfo(activeSlimes.getLast());//pass the info along
+				activePlaceholders.get(i).retire();
+				activePlaceholders.remove(i);
+			}
 		}
 		widthWithZoom = playStage.getWidth() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 		heightWithZoom = playStage.getHeight() * ((OrthographicCamera)(playStage.getCamera())).zoom;
@@ -198,8 +223,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		orthoCam.position.set(currentPlayer.getX(), currentPlayer.getY(), 0);
 		miniMap.update();
 		miniMap.activateBlock(round(currentPlayer.getX(),  24, false)/24,
-				round(currentPlayer.getY(), 24, false)/24);
-		
+				round(currentPlayer.getY(), 24, false)/24, this);
 		
 		
 	}
@@ -342,6 +366,17 @@ public class PlayScreen implements Screen, InputProcessor{
 			characterHash.get(key).clear();
 		}
 	}
+	public void generateMonsterAt(float x, float y){
+		activePlaceholders.add(placeholderPool.getObject());
+		if(activePlaceholders.getLast() == null){
+			activePlaceholders.removeLast();
+			activePlaceholders.add(new MonsterPlaceholder(x, y,
+						3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
+		}
+		activePlaceholders.getLast().setImage(MainFrame.slimeFrames[0]);
+		System.out.println(currentPlayer.getMovementSpeed());
+	}
+	
 	public <G extends Character> void hashCharacter(Character passChar){
 		//bottom right corner
 		temp = hash(passChar.getX(), passChar.getY()); //get hash key

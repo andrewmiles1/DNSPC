@@ -94,7 +94,7 @@ public class MiniMap {
 		this.midOfScreenX = passMidOfScreenX;
 		this.midOfScreenY = passMidOfScreenY;
 	}
-	public void activateBlock(int x, int y){
+	public void activateBlock(int x, int y, PlayScreen play){
 		if(playerXnY.x == x && playerXnY.y == y){
 			return;
 		}
@@ -104,6 +104,8 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x][y+1+i] == 0){
 					visibilityMap[x][y+1+i] = 9;//set visible
+					play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
+							(y+1+i) * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x][y+1+i] == 1){//if I reached a wall
 					break;
@@ -114,6 +116,8 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x][y-1-i] == 0){
 					visibilityMap[x][y-1-i] = 9;//set visible
+					play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
+							(y-1-i) * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x][y-1-i] == 1){
 					break;
@@ -124,6 +128,8 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x+1+i][y] == 0){
 					visibilityMap[x+1+i][y] = 9;//set visible
+					play.generateMonsterAt((x + 1 + i) * MainFrame.TILE_SIZE * 3,
+							y * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x+1+i][y] == 1){
 					break;
@@ -134,6 +140,8 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x-1-i][y] == 0){
 					visibilityMap[x-1-i][y] = 9;//set visible
+					play.generateMonsterAt((x-1-i) * MainFrame.TILE_SIZE * 3,
+							y * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x-1-i][y] == 1){
 					break;

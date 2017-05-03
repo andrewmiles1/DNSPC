@@ -19,7 +19,7 @@ public class Wizard extends Player{
 				flipped?
 				MainFrame.wizardFrames[animationIndex].getRegionWidth()*-1:MainFrame.wizardFrames[animationIndex].getRegionWidth(),
 				MainFrame.wizardFrames[animationIndex].getRegionHeight());
-		batch.draqw()
+		
 	}
 
 	@Override
