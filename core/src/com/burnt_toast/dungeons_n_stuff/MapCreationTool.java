@@ -34,6 +34,7 @@ public class MapCreationTool {
 	TiledMapTile topLeftCorner;
 	TiledMapTile botLeftCorner;
 	TiledMapTile botRightCorner;
+	TiledMapTile doorTile;
 	
 	//used for making map look pretty
 	int idSum;
@@ -60,6 +61,7 @@ public class MapCreationTool {
 		topRightCorner = tileSet.getTile(2);
 		botLeftCorner = tileSet.getTile(17);
 		botRightCorner = tileSet.getTile(18);
+		doorTile = tileSet.getTile(7);
 		
 
 	}
@@ -182,6 +184,7 @@ public class MapCreationTool {
 			}//end column for
 			System.out.println("");
 		}//end row for
+		visualLayer.getCell(currentCollisionMap.length-5, currentCollisionMap.length - 3).setTile(doorTile);
 		//visualLayer.getCell(1, 1).setTile(this.middleBrickTile);
 		//visualLayer.getCell(1, 2).setTile(this.middleBrickTile); UP
 		//visualLayer.getCell(2, 1).setTile(this.middleBrickTile); RIGHT

@@ -27,7 +27,8 @@ public abstract class Monster extends Character{
 		super(passFrames);
 		this.isMoving = true;
 		this.parentPool = parentPool;
-		hitPause = 0.25f;
+		hitPause = 1.0f;
+		this.setDirection('n');//n for nunya business
 		// TODO Auto-generated constructor stub
 	}
 	
@@ -36,7 +37,7 @@ public abstract class Monster extends Character{
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
 		if(hitPauseTimer > 0){
-			batch.setColor(150, 150, 150, 100);
+			//batch.setColor(150, 150, 150, 100);
 		}
 		if(flipped == true){
 			batch.draw(this.frames[this.animationIndex], this.getX(), this.getY(),
@@ -49,30 +50,38 @@ public abstract class Monster extends Character{
 		batch.setColor(Color.WHITE);
 		
 	}
-	@Override
-	public void attack() {
-		// TODO Auto-generated method stub
-		
+	public int attack(){
+		return (int)(Math.random()*5);
 	}
 
 	public void setGiveUpTime(float passPatience){
 		patienceTime = passPatience;
 		giveUpTimer = passPatience;
 	}
-	public boolean update(float playerX, float playerY){
-
+	public boolean update(Player currentPlayer){
+		
 		if(this.health <=0){
 			//retire object
-			System.out.println("I'm dead.");
 			this.toggleInUse();
 		}
+		move(currentPlayer.getX(), currentPlayer.getY());
+		update();
 		if(hitPauseTimer > 0){
+			//color change when I'mhit
+		}
+		if(PlayScreen.distForm(currentPlayer.getX()+currentPlayer.getRectangle().getWidth()/2,
+				currentPlayer.getY()+currentPlayer.getRectangle().getHeight()/2,
+				getX()+collisionRect.getWidth()/2, getY()+collisionRect.getHeight()/2) <= 10){
 			hitPauseTimer -= Gdx.graphics.getDeltaTime();
+			//if center of player is a certain distance away, then hit it
+			if(hitPauseTimer <= 0){
+			currentPlayer.hit(this.attack());
+			hitPauseTimer = hitPause;
+			}
 		}
-		if(hitPauseTimer <= 0){
-			move(playerX, playerY);
-			update();
-		}
+		else
+			hitPauseTimer = hitPause;
+		
 		if(giveUpTimer > 0){
 			giveUpTimer -= Gdx.graphics.getDeltaTime();
 		}
@@ -112,6 +121,7 @@ public abstract class Monster extends Character{
 		this.hitPauseTimer = hitPause;
 	}
 	
+	
 	/**
 	 * calculates the health for the current level of floor and such.
 	 * @return
@@ -122,6 +132,8 @@ public abstract class Monster extends Character{
 		// TODO Auto-generated method stub
 		this.inUse = true;
 		this.health = this.calcHealth();
+		this.meeleeDamage[0] = 1;
+		this.meeleeDamage[1] = 3;
 		//set all the waling speed and stuff based off floor level
 	}
 	@Override

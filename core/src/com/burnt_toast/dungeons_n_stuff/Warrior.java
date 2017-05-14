@@ -8,7 +8,6 @@ public class Warrior extends Player{
 	public Warrior() {
 		super(MainFrame.warriorFrames);
 		this.attackMaxTime = 0.25f;
-		this.meeleeDamage = new float[2];
 		this.meeleeDamage[0] = 1;
 		this.meeleeDamage[1] = 2;
 		// TODO Auto-generated constructor stub
@@ -29,7 +28,7 @@ public class Warrior extends Player{
 			
 			if(direction == 'r' || direction == 'l'){
 			batch.draw(MainFrame.warriorFrames[2],
-					flipped? meleeRect.x + meleeSizeX:meleeRect.x,
+					flipped? meleeRect.x + meleeRect.getWidth():meleeRect.x,
 					meleeRect.y,
 					flipped?
 					MainFrame.warriorFrames[2].getRegionWidth()*-1:MainFrame.warriorFrames[2].getRegionWidth(),

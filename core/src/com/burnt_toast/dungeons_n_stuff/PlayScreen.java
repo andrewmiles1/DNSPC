@@ -40,6 +40,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private TiledMapTileLayer map;
 	//hud
 	private TextureRegion healthBar;
+	private TextureRegion hpTag;
 	private TextureRegion healthBorder;
 	private TextureRegion currentWeapon;//never initialized! on purpose
 	
@@ -99,8 +100,10 @@ public class PlayScreen implements Screen, InputProcessor{
 				mazeMap.getTileSets().getTileSet(0));
 		
 		//HUD
-		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 31, 6);
-		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 33, 8);
+
+		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 43, 4);
+		hpTag = new TextureRegion(MainFrame.mainTileset, 44, 53, 9, 4);
+		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 45, 6);
 		
 		//Monster Generator
 		//testPlaceholder = new MonsterPlaceholder(MainFrame.TILE_SIZE * 8, MainFrame.TILE_SIZE * 4,
@@ -113,6 +116,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		characterHash = new HashMap<Float, LinkedList<Character>>();
 		placeholderHash = new HashMap<Float, LinkedList<MonsterPlaceholder>>();
+		
+		orthoCam.zoom -= 0.5;
 	}
 	
 	
@@ -131,6 +136,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		loadMap();
 		miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
 		miniMap.activateBlock(1, 1, this);
+		
 	}
 
 	@Override
@@ -176,53 +182,60 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		hudStage.getBatch().begin();
 		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2, hudStage.getHeight()-35,
-				healthBorder.getRegionWidth() * 3, healthBorder.getRegionHeight() * 3);
+				healthBorder.getRegionWidth() * 2, healthBorder.getRegionHeight() * 2);
+		hudStage.getBatch().draw(healthBar, hudStage.getWidth()/2+2,  hudStage.getHeight()-35+2,
+				(currentPlayer.getHealth()/currentPlayer.getMaxHealth())*43 * 2, healthBar.getRegionHeight() * 2);
+		hudStage.getBatch().draw(hpTag, hudStage.getWidth()/2+(healthBorder.getRegionWidth()-hpTag.getRegionWidth()),
+				hudStage.getHeight()-35+2,
+				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
 		miniMap.draw((SpriteBatch)hudStage.getBatch());
 		hudStage.getBatch().end();
 		
 		
 		
 		//INPUT
-		
-		//CALCULATE
-		//clear hash
-		this.clearHash();
-		//rehash everything
-		for(Slime sl: activeSlimes){
-			hashCharacter(sl);
-		}
-		this.hashCharacter(currentPlayer);
-		
-		for(int i = 0; i < activeSlimes.size(); i++){
-			activeSlimes.get(i).update(currentPlayer.getX(), currentPlayer.getY());
-			if(!activeSlimes.get(i).getIfInUse()){
-				activeSlimes.get(i).retire();
-				activeSlimes.remove(i);
+		if(!pause){
+			//CALCULATE
+			//clear hash
+			this.clearHash();
+			//rehash everything
+			for(Slime sl: activeSlimes){
+				hashCharacter(sl);
 			}
-		}
-		for(MonsterPlaceholder m: activePlaceholders){
-			m.checkVisibility(currentPlayer.getX(), currentPlayer.getY());
-		}
-		for(int i = 0; i < activePlaceholders.size(); i++){
-			if(activePlaceholders.get(i).getIfActivated()){
-				//remove the placholder from the linked list here
-				activePlaceholders.get(i).toggleInUse();
-				this.activeSlimes.add(slimePool.getObject());
-				if(activeSlimes.getLast() == null){//if there were none in the pool
-					System.out.println("Yeah");
-					activeSlimes.removeLast();
-					activeSlimes.add(new Slime(slimePool));
-				}//end if slime is null
-				activeSlimes.getLast().calcHealth();
-				activeSlimes.getLast().toggleInUse();
-				activePlaceholders.get(i).copyInfo(activeSlimes.getLast());//pass the info along
-				activePlaceholders.get(i).retire();
-				activePlaceholders.remove(i);
+			this.hashCharacter(currentPlayer);
+			
+			for(int i = 0; i < activeSlimes.size(); i++){
+				activeSlimes.get(i).update(currentPlayer);
+				if(!activeSlimes.get(i).getIfInUse()){
+					activeSlimes.get(i).retire();
+					activeSlimes.remove(i);
+				}
 			}
-		}
+			for(MonsterPlaceholder m: activePlaceholders){
+				m.checkVisibility(currentPlayer.getX(), currentPlayer.getY());
+			}
+			for(int i = 0; i < activePlaceholders.size(); i++){
+				if(activePlaceholders.get(i).getIfActivated()){
+					//remove the placholder from the linked list here
+					activePlaceholders.get(i).toggleInUse();
+					this.activeSlimes.add(slimePool.getObject());
+					if(activeSlimes.getLast() == null){//if there were none in the pool
+						System.out.println("Yeah");
+						activeSlimes.removeLast();
+						activeSlimes.add(new Slime(slimePool));
+					}//end if slime is null
+					activeSlimes.getLast().calcHealth();
+					activeSlimes.getLast().toggleInUse();
+					activePlaceholders.get(i).copyInfo(activeSlimes.getLast());//pass the info along
+					activePlaceholders.get(i).retire();
+					activePlaceholders.remove(i);
+				}
+			}
+			currentPlayer.update();
+		}//end if not pause
 		widthWithZoom = playStage.getWidth() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 		heightWithZoom = playStage.getHeight() * ((OrthographicCamera)(playStage.getCamera())).zoom;
-		currentPlayer.update();
+
 		orthoCam.position.set(currentPlayer.getX(), currentPlayer.getY(), 0);
 		miniMap.update();
 		miniMap.activateBlock(round(currentPlayer.getX(),  24, false)/24,
@@ -293,7 +306,7 @@ public class PlayScreen implements Screen, InputProcessor{
 			System.out.println();
 		}
 
-		this.collisionMap = mapTool.prepareMap(10);
+		this.collisionMap = mapTool.prepareMap(16);
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
 		floorLevel = 1;
 	}//end load map
@@ -401,19 +414,30 @@ public class PlayScreen implements Screen, InputProcessor{
 	}
 	
 	public static boolean checkCharacterCollision(float x, float y, Rectangle rect){
-		tempRect.width = rect.width;
-		tempRect.height = rect.height;
-		tempRect.x = x;
-		tempRect.y = y;
+		
+		tempRect.setWidth(rect.getWidth());
+		tempRect.setHeight(rect.getHeight());
+		tempRect.setX(x);
+		tempRect.setY(y);
 		for(Slime sl: activeSlimes){
-			if(sl.getRectangle().overlaps(tempRect)){
+			if(sl.getRectangle().overlaps(tempRect) && !sl.getRectangle().equals(rect)){
 				return true;
 			}
 		}
-		if(currentPlayer.getRectangle().overlaps(rect)){
+		if(currentPlayer.getRectangle().overlaps(rect) && !currentPlayer.getRectangle().equals(rect)){
 			return true;
 		}
 		return false;
+	}
+	
+	public static float distForm(float x1, float y1, float x2, float y2){
+		return (float) Math.sqrt(Math.abs(Math.pow(x2 - x1, 2) + (Math.pow(y2 - y1, 2))));
+	}
+	public int randomBetween(float num1, float num2){
+		if(num2 < num1){
+			System.err.println("Num2 must be < num1 in randomBetween(num1, num2)");
+		}
+		return (int)(Math.random() * (num2 - num1) +num1);
 	}
 	
 	@Override
@@ -442,6 +466,13 @@ public class PlayScreen implements Screen, InputProcessor{
 			currentPlayer.setDirection('r');
 			currentPlayer.setIfMoving(true);
 			return true;
+		}
+		else if(keycode == Keys.P){
+			if(pause){
+				pause = false;
+			}
+			else
+				pause = true;
 		}
 		else if(keycode == Keys.M){
 			miniMap.toggleIfOnScreen();

@@ -149,7 +149,7 @@ public class SplashScreen implements Screen{
 			main.archerFrames = new TextureRegion[5];
 			main.archerFrames[0] = new TextureRegion(main.characterTexture, 0, 10, 9, 10);//person
 			main.archerFrames[1] = new TextureRegion(main.characterTexture, 9, 10, 8, 9);//person step attack
-			main.archerFrames[2] = new TextureRegion(main.characterTexture, 17, 11, 8, 8);//meelee
+			main.archerFrames[2] = new TextureRegion(main.mainTileset, 33, 40, 6, 9);//meelee
 			main.archerFrames[3] = new TextureRegion(main.characterTexture, 25, 12, 3, 5);//blue normal arrow
 			main.archerFrames[4] = new TextureRegion(main.characterTexture, 28, 12, 3, 5);//green poison arrow
 			
@@ -179,7 +179,7 @@ public class SplashScreen implements Screen{
 			main.warriorFrames = new TextureRegion[5];
 			main.warriorFrames[0] = new TextureRegion(main.characterTexture, 0, 0, 8, 9);//person 
 			main.warriorFrames[1] = new TextureRegion(main.characterTexture, 8, 0, 9, 9);//person step and attack
-			main.warriorFrames[2] = new TextureRegion(main.characterTexture, 18, 1, 6, 6);//meelee.
+			main.warriorFrames[2] = new TextureRegion(main.mainTileset, 26, 40, 5, 9);//meelee.
 			main.slimeFrames = new TextureRegion[4];
 			main.slimeFrames[0] = new TextureRegion(main.characterTexture, 0, 30, 8, 4);
 			main.slimeFrames[1] = new TextureRegion(main.characterTexture, 8, 29, 8, 5);
