@@ -185,7 +185,15 @@ public class SplashScreen implements Screen{
 			main.slimeFrames[1] = new TextureRegion(main.characterTexture, 8, 29, 8, 5);
 			break;
 		case 0:
-			main.silverFrame = new TextureRegion(MainFrame.mainTileset, 112, 24, 8, 8);
+			MainFrame.doorFrames = new TextureRegion[4];
+			main.doorFrames[0] = new TextureRegion(main.mainTileset, 96, 0, 8, 8);
+			main.doorFrames[1] = new TextureRegion(main.mainTileset, 104, 0, 8, 8);
+			main.doorFrames[2] = new TextureRegion(main.mainTileset, 112, 0, 8, 8);
+			main.doorFrames[3] = new TextureRegion(main.mainTileset, 120, 0, 8, 8);
+			main.buttonFrames = new TextureRegion[2];
+			main.buttonFrames[0] = new TextureRegion(MainFrame.mainTileset, 96, 16, 8, 8);
+			main.buttonFrames[1] = new TextureRegion(MainFrame.mainTileset, 96, 24, 8, 8);
+			main.silverFrame = new TextureRegion(main.mainTileset, 112, 24, 8, 8);
 			Gdx.input.setInputProcessor(main.getInputMultiplexer());
 			main.menuScreen = new MenuScreen(main);
 			main.playScreen = new PlayScreen(main);

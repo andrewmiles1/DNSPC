@@ -51,6 +51,9 @@ public class MainFrame extends Game {
 	public static TextureRegion[] swordStages;//0 1 and 2 are the 3 levels
 	public static TextureRegion[] ringStages;
 	public static TextureRegion[] arrowStages;
+	
+	public static TextureRegion[] doorFrames;
+	public static TextureRegion[] buttonFrames;
 	public Consumer fadeOutCode;//code that's run when a fade out completes.
 	
 	public float fadeTracker;//to track the fade function

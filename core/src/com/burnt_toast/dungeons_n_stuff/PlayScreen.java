@@ -72,6 +72,12 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	private static Player currentPlayer;
 	
+	private Rectangle endDoorRect;
+	private Rectangle buttonRect;
+	private AnimatedObject endDoor;
+	private boolean doorButtonPressed;
+	
+	
 	public PlayScreen(MainFrame passedMain){
 		main = passedMain;
 		orthoCam = new OrthographicCamera(MainFrame.SCREEN_WIDTH, MainFrame.SCREEN_HEIGHT);
@@ -118,6 +124,11 @@ public class PlayScreen implements Screen, InputProcessor{
 		placeholderHash = new HashMap<Float, LinkedList<MonsterPlaceholder>>();
 		
 		orthoCam.zoom -= 0.5;
+		
+		buttonRect = new Rectangle(0, 0, 8, 8);
+		endDoorRect = new Rectangle(0, 0, 6, 2);
+		endDoor = new AnimatedObject(MainFrame.doorFrames, 0.05f, false, 0, 0);
+		floorLevel = 1;
 	}
 	
 	
@@ -130,12 +141,10 @@ public class PlayScreen implements Screen, InputProcessor{
 		main.fadeIn = true;
 		main.fadeOut = false;
 		orthoCam.update();
-		currentPlayer.setPosition(3 * MainFrame.TILE_SIZE, 3 * MainFrame.TILE_SIZE);
-		currentPlayer.setDirection('u');//up at default.
 		main.addInputProcessor(this);
 		loadMap();
 		miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
-		miniMap.activateBlock(1, 1, this);
+
 		
 	}
 
@@ -151,6 +160,12 @@ public class PlayScreen implements Screen, InputProcessor{
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
 		}
+		if(main.fadeTracker == 0 && main.fadeCodename.equals("next level")){
+			System.out.println("Hi");
+				floorLevel++;
+				loadMap();
+				main.fadeIn=true;
+		}
 		
 		//ERIC
 		otmr.setView(orthoCam);
@@ -164,7 +179,19 @@ public class PlayScreen implements Screen, InputProcessor{
 		otmr.renderTileLayer((TiledMapTileLayer)mazeMap.getLayers().get(0));
 		otmr.getBatch().end();
 		
+
+		
 		playStage.getBatch().begin();
+		//stuff drawn in order of placement in front of stuff
+		if(this.doorButtonPressed){
+			endDoor.draw((SpriteBatch)playStage.getBatch());
+			playStage.getBatch().draw(MainFrame.buttonFrames[1],
+					buttonRect.getX(), buttonRect.getY());
+		}
+		else{
+			playStage.getBatch().draw(MainFrame.buttonFrames[0], buttonRect.getX(), buttonRect.getY());
+		}
+		
 		currentPlayer.draw((SpriteBatch)playStage.getBatch());
 		//draw the test slime
 		
@@ -178,7 +205,10 @@ public class PlayScreen implements Screen, InputProcessor{
 
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
 		main.gameFont.draw(playStage.getBatch(), "X : " + dragChangeX + "|Y: " + dragChangeY, 0, 0);
+
 		playStage.getBatch().end();
+		
+		
 		
 		hudStage.getBatch().begin();
 		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2, hudStage.getHeight()-35,
@@ -231,8 +261,23 @@ public class PlayScreen implements Screen, InputProcessor{
 					activePlaceholders.remove(i);
 				}
 			}
+			endDoor.update();
 			currentPlayer.update();
+			
+			if(currentPlayer.getRectangle().overlaps(buttonRect)){
+				if(!this.doorButtonPressed){
+				this.doorButtonPressed = true;
+				endDoor.play();
+				}
+			}
+			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
+				pause = true;
+				main.fadeOut = true;
+				main.fadeCodename = "next level";
+			}
 		}//end if not pause
+
+		
 		widthWithZoom = playStage.getWidth() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 		heightWithZoom = playStage.getHeight() * ((OrthographicCamera)(playStage.getCamera())).zoom;
 
@@ -279,36 +324,48 @@ public class PlayScreen implements Screen, InputProcessor{
 
 
 	public void loadMap(){//mapWidth = menuMap.getProperties().get("width" , Integer.class)
-		//load collision:
-		for(int i = 0; i < 49;i++){
-			for(int j = 0; j < 49;j++){
-				if(((TiledMapTileLayer)mazeMap.getLayers().get(2)).getCell(i, j) != null){
-					if(((TiledMapTileLayer)mazeMap.getLayers().get("collision")).getCell(i, j).getTile().getId() == 32){
-						//tile is red in collision map
-						collisionMap[i][j] = 1;//passable
-					}//end if red
-					else{
-						collisionMap[i][j] = 0;//unpassable
-						System.out.println(((TiledMapTileLayer)mazeMap.getLayers().get("collision")).getCell(i, j).getTile().getId());
-						System.out.println(mazeMap.getProperties().get("width" , Integer.class) + "ALKSJDF");
-					}//end else
-				}//endif null
-				else{
-					collisionMap[i][j] = 0;//unpassable
-				}
-			}
-		}//end nested for loop for loading collision
-		System.out.println(collisionMap[0].length-1);
-		for(int i = 0; i < collisionMap[0].length-1;i++){
-			for (int j = 0; j < collisionMap[0].length-1;j++){
-				System.out.print(collisionMap[i][j]);
-			}
-			System.out.println();
-		}
+//		//load collision:
+//		for(int i = 0; i < (5 );i++){
+//			for(int j = 0; j < (5);j++){
+//				if(((TiledMapTileLayer)mazeMap.getLayers().get(2)).getCell(i, j) != null){
+//					if(((TiledMapTileLayer)mazeMap.getLayers().get("collision")).getCell(i, j).getTile().getId() == 32){
+//						//tile is red in collision map
+//						collisionMap[i][j] = 1;//passable
+//					}//end if red
+//					else{
+//						collisionMap[i][j] = 0;//unpassable
+//						System.out.println(((TiledMapTileLayer)mazeMap.getLayers().get("collision")).getCell(i, j).getTile().getId());
+//						System.out.println(mazeMap.getProperties().get("width" , Integer.class) + "ALKSJDF");
+//					}//end else
+//				}//endif null
+//				else{
+//					collisionMap[i][j] = 0;//unpassable
+//				}
+//			}
+//		}//end nested for loop for loading collision
+//		System.out.println(collisionMap[0].length-1);
+//		for(int i = 0; i < collisionMap[0].length-1;i++){
+//			for (int j = 0; j < collisionMap[0].length-1;j++){
+//				System.out.print(collisionMap[i][j]);
+//			}
+//			System.out.println();
+//		}
 
-		this.collisionMap = mapTool.prepareMap(16);
+		collisionMap = mapTool.prepareMap(4 + (2*(PlayScreen.floorLevel-1)));
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
-		floorLevel = 1;
+		
+		endDoor.setX((collisionMap.length-5)*8);
+		endDoor.setY((collisionMap.length-3)*8);
+		endDoorRect.setX((collisionMap.length - 5) * 8);
+		endDoorRect.setY((collisionMap.length-3) * 8 - endDoorRect.getHeight());
+		buttonRect.x = (collisionMap.length-4)*8;
+		buttonRect.y = (collisionMap.length-4)*8;
+		
+		currentPlayer.setPosition(3 * MainFrame.TILE_SIZE, 3 * MainFrame.TILE_SIZE);
+		currentPlayer.setDirection('u');//up at default.
+		miniMap.activateBlock(1, 1, this);
+		pause = false;
+		this.doorButtonPressed = false;
 	}//end load map
 	public void buttonCode(String buttonName){
 		
@@ -383,6 +440,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 	public void generateMonsterAt(float x, float y){
+		if(false){
 		activePlaceholders.add(placeholderPool.getObject());
 		if(activePlaceholders.getLast() == null){
 			activePlaceholders.removeLast();
@@ -391,6 +449,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 		activePlaceholders.getLast().setImage(MainFrame.slimeFrames[0]);
 		System.out.println(currentPlayer.getMovementSpeed());
+		}
 	}
 	
 	public <G extends Character> void hashCharacter(Character passChar){

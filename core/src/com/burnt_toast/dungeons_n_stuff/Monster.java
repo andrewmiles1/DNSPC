@@ -20,6 +20,12 @@ public abstract class Monster extends Character{
 	protected float hitPauseTimer;
 	@SuppressWarnings("rawtypes")
 	protected Pool parentPool;
+	//these next 3 are for moving more smoothly. actually these next 5.
+	protected float totalDistance;
+	protected float distanceX;
+	protected float distanceY;
+	protected float velocityX;
+	protected float velocityY;
 	
 	
 	@SuppressWarnings("rawtypes")
@@ -93,6 +99,17 @@ public abstract class Monster extends Character{
 		return false;
 	}
 	public void move(float playerX, float playerY){
+		/*	protected float totaldistance;
+		protected float distanceX;
+		protected float distanceY;
+		protected float velocityX;
+		protected float velocityY;
+		 */
+		distanceX = this.getX() - playerX;
+		distanceY = this.getY() - playerY;
+		totalDistance = Math.abs(distanceX) + Math.abs(distanceY);
+		velocityX = (distanceX / totalDistance) * movementSpeed;
+		velocityY = (distanceY / totalDistance) * movementSpeed;
 		if(playerX < this.getX()){
 			this.move('l');
 			//this.collisionRect.x -= this.movementSpeed * Gdx.graphics.getDeltaTime();

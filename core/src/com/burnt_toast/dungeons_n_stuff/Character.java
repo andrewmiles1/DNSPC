@@ -67,7 +67,7 @@ public abstract class Character extends Poolable{
 	 * @param passDirection
 	 */
 	public void move(char passDirection){
-		//System.out.println(str);
+		//System.out.println(str)
 		this.direction = passDirection;
 		move();
 	}
@@ -121,7 +121,7 @@ public abstract class Character extends Poolable{
 				animationTimer = 0;
 				animationIndex = animationIndex == 0? 1:0;//if it's 0, than make it one, if not, then 0
 			}
-			move();
+			//move();
 		}
 		if(attackTimer > 0){
 			attackTimer -= Gdx.graphics.getDeltaTime();

@@ -43,6 +43,9 @@ public class MazeGenerator {
 	}
 	
 	public int[][] generateMaze(int size){//has to be odd
+		availableCells.clear();
+		families.clear();
+		availableNeighbors.clear();
 		if(size % 2 == 0){//if even numbered size. Since it has to be.
 			//getready
 			mazeSize = size;

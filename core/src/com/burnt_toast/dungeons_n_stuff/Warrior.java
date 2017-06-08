@@ -43,7 +43,6 @@ public class Warrior extends Player{
 					//(direction == 'u')?if flipped y
 					MainFrame.warriorFrames[2].getRegionHeight()*-1, 1, 1, 90);
 			}//emd else
-
 			
 		}
 		//this 2 line of code shows where the melee rect is at 
