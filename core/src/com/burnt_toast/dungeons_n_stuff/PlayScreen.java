@@ -36,7 +36,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private static float temp;
 	private static Rectangle tempRect;
 	
-	private static int floorLevel;
+	public static int floorLevel;
 	private TiledMapTileLayer map;
 	//hud
 	private TextureRegion healthBar;
@@ -440,11 +440,11 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 	public void generateMonsterAt(float x, float y){
-		if(false){
+		if(Math.random() >= (0.6 - 0.1 * floorLevel)){
 		activePlaceholders.add(placeholderPool.getObject());
 		if(activePlaceholders.getLast() == null){
 			activePlaceholders.removeLast();
-			activePlaceholders.add(new MonsterPlaceholder(x, y,
+			activePlaceholders.add(new MonsterPlaceholder(x + MainFrame.TILE_SIZE, y + MainFrame.TILE_SIZE,
 						3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
 		}
 		activePlaceholders.getLast().setImage(MainFrame.slimeFrames[0]);

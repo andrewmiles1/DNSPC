@@ -57,7 +57,7 @@ public abstract class Monster extends Character{
 		
 	}
 	public int attack(){
-		return (int)(Math.random()*5);
+		return (int)(Math.random()*(Math.abs(this.meeleeDamage[0] - this.meeleeDamage[1])+meeleeDamage[0]));
 	}
 
 	public void setGiveUpTime(float passPatience){
