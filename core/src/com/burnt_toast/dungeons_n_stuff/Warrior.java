@@ -1,5 +1,6 @@
 package com.burnt_toast.dungeons_n_stuff;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 
@@ -24,7 +25,7 @@ public class Warrior extends Player{
 				MainFrame.warriorFrames[animationIndex].getRegionWidth()*-1:MainFrame.warriorFrames[animationIndex].getRegionWidth(),
 				MainFrame.warriorFrames[animationIndex].getRegionHeight());
 		if(attackTimer > 0 ){//if we're attacking
-
+			batch.setColor(1, 1, 1, attackTimer/attackMaxTime*0.75f);
 			
 			if(direction == 'r' || direction == 'l'){
 			batch.draw(MainFrame.warriorFrames[2],
@@ -43,6 +44,7 @@ public class Warrior extends Player{
 					//(direction == 'u')?if flipped y
 					MainFrame.warriorFrames[2].getRegionHeight()*-1, 1, 1, 90);
 			}//emd else
+			batch.setColor(1, 1, 1, 1);
 			
 		}
 		//this 2 line of code shows where the melee rect is at 

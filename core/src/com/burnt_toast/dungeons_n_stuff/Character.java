@@ -66,12 +66,14 @@ public abstract class Character extends Poolable{
 	 * 
 	 * @param passDirection
 	 */
-	public void move(char passDirection){
-		//System.out.println(str)
+	public void move(char passDirection, float custSpeed){
 		this.direction = passDirection;
-		move();
+		move(custSpeed);
 	}
 	public void move(){
+		move(-1);//if the method gets -1, it just uses the default moving speed
+	}
+	public void move(float custSpeed){//custom speed to move
 		tempX = collisionRect.x;
 		tempY = collisionRect.y;
 		if(direction == 'u'){
@@ -81,7 +83,9 @@ public abstract class Character extends Poolable{
 					!PlayScreen.checkCharacterCollision(collisionRect.x,
 							collisionRect.y + (movementSpeed * Gdx.graphics.getDeltaTime()), collisionRect)
 					){//if no collision.
-				this.collisionRect.y += this.movementSpeed * Gdx.graphics.getDeltaTime();
+
+				this.collisionRect.y += (custSpeed == -1? this.movementSpeed : custSpeed) * Gdx.graphics.getDeltaTime();
+				
 			}
 		}
 		else if(direction == 'd'){
@@ -89,7 +93,7 @@ public abstract class Character extends Poolable{
 					collisionRect.getWidth(), collisionRect.getHeight()) &&
 					!PlayScreen.checkCharacterCollision(collisionRect.x,
 							collisionRect.y - (movementSpeed * Gdx.graphics.getDeltaTime()), collisionRect)){//if no collision.
-				collisionRect.y -= movementSpeed * Gdx.graphics.getDeltaTime();
+				collisionRect.y -= (custSpeed == -1? this.movementSpeed : custSpeed) * Gdx.graphics.getDeltaTime();
 			}
 		}
 		else if(direction == 'r'){
@@ -97,7 +101,7 @@ public abstract class Character extends Poolable{
 					collisionRect.getWidth(), collisionRect.getHeight()) &&
 					!PlayScreen.checkCharacterCollision(collisionRect.x + (movementSpeed * Gdx.graphics.getDeltaTime()),
 							collisionRect.y, collisionRect)){//if no collision.
-				collisionRect.x += movementSpeed * Gdx.graphics.getDeltaTime();
+				collisionRect.x += (custSpeed == -1? this.movementSpeed : custSpeed) * Gdx.graphics.getDeltaTime();
 			}
 		}
 		else if(direction == 'l'){
@@ -105,7 +109,7 @@ public abstract class Character extends Poolable{
 					collisionRect.getWidth(), collisionRect.getHeight()) &&
 					!PlayScreen.checkCharacterCollision(collisionRect.x - (movementSpeed * Gdx.graphics.getDeltaTime()),
 							collisionRect.y, collisionRect)){//if no collision.
-				collisionRect.x -= movementSpeed * Gdx.graphics.getDeltaTime();
+				collisionRect.x -= (custSpeed == -1? this.movementSpeed : custSpeed) * Gdx.graphics.getDeltaTime();
 			}
 		}
 		if(PlayScreen.checkCharacterCollision(collisionRect.x, collisionRect.y, collisionRect)){

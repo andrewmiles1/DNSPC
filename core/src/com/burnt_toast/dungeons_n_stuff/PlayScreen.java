@@ -33,6 +33,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private Stage hudStage;
 	private OrthographicCamera orthoCam;
 	private boolean pause;
+	private boolean gameOver;
 	private static float temp;
 	private static Rectangle tempRect;
 	
@@ -161,7 +162,6 @@ public class PlayScreen implements Screen, InputProcessor{
 			main.fade(otmr.getBatch());
 		}
 		if(main.fadeTracker == 0 && main.fadeCodename.equals("next level")){
-			System.out.println("Hi");
 				floorLevel++;
 				loadMap();
 				main.fadeIn=true;
@@ -204,7 +204,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
-		main.gameFont.draw(playStage.getBatch(), "X : " + dragChangeX + "|Y: " + dragChangeY, 0, 0);
+		main.gameFont.draw(playStage.getBatch(), "Floor Level: " + floorLevel, 0, 0);
 
 		playStage.getBatch().end();
 		
@@ -220,6 +220,11 @@ public class PlayScreen implements Screen, InputProcessor{
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
 		miniMap.draw((SpriteBatch)hudStage.getBatch());
 		hudStage.getBatch().end();
+		
+		if(currentPlayer.health <= 0){
+			gameOver = true;
+			pause = true;
+		}
 		
 		
 		
@@ -371,6 +376,12 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 	}
 	
+	public void reset(){
+		gameOver = false;
+		floorLevel = 1;
+		this.show();
+	}
+	
 	//check collision
 	public static boolean checkCollisionAt(float x, float y,float width, float height){
 		if(collisionMap[round(x, 8, false)/8][round(y,8, false)/8] == 1 ||//bottom left corner
@@ -420,9 +431,6 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 
-	public static int getCurrentLevel(){
-		return floorLevel;
-	}
 	//HASH MAP STUFF
 	public static LinkedList<Character> getCharactersAt(float x, float y){
 		temp = hash(x, y);
@@ -440,12 +448,12 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 	public void generateMonsterAt(float x, float y){
-		if(Math.random() >= (0.6 - 0.1 * floorLevel)){
+		if(Math.random() >= (0.9 - 0.1 * floorLevel)){
 		activePlaceholders.add(placeholderPool.getObject());
 		if(activePlaceholders.getLast() == null){
 			activePlaceholders.removeLast();
 			activePlaceholders.add(new MonsterPlaceholder(x + MainFrame.TILE_SIZE, y + MainFrame.TILE_SIZE,
-						3 * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
+						3 * floorLevel * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
 		}
 		activePlaceholders.getLast().setImage(MainFrame.slimeFrames[0]);
 		System.out.println(currentPlayer.getMovementSpeed());
@@ -503,6 +511,10 @@ public class PlayScreen implements Screen, InputProcessor{
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
 		if(keycode == Keys.SPACE){
+			if(gameOver){
+				main.setScreen(main.menuScreen);
+				return true;
+			}
 			currentPlayer.attack();
 			return true;
 		}
@@ -527,7 +539,7 @@ public class PlayScreen implements Screen, InputProcessor{
 			return true;
 		}
 		else if(keycode == Keys.P){
-			if(pause){
+			if(pause && (!gameOver)){
 				pause = false;
 			}
 			else

@@ -99,32 +99,26 @@ public abstract class Monster extends Character{
 		return false;
 	}
 	public void move(float playerX, float playerY){
-		/*	protected float totaldistance;
-		protected float distanceX;
-		protected float distanceY;
-		protected float velocityX;
-		protected float velocityY;
-		 */
-		distanceX = this.getX() - playerX;
-		distanceY = this.getY() - playerY;
+		distanceX = Math.abs(this.getX() - playerX);
+		distanceY = Math.abs(this.getY() - playerY);
 		totalDistance = Math.abs(distanceX) + Math.abs(distanceY);
 		velocityX = (distanceX / totalDistance) * movementSpeed;
 		velocityY = (distanceY / totalDistance) * movementSpeed;
 		if(playerX < this.getX()){
-			this.move('l');
-			//this.collisionRect.x -= this.movementSpeed * Gdx.graphics.getDeltaTime();
+			this.move('l', velocityX);
+			//this.collisionRect.x -= this.velocityX * Gdx.graphics.getDeltaTime();
 		}
 		else if(playerX > this.getX()){
-			this.move('r');
-			//this.collisionRect.x += this.movementSpeed * Gdx.graphics.getDeltaTime();
+			this.move('r', velocityX);
+			//this.collisionRect.x += this.velocityX * Gdx.graphics.getDeltaTime();
 		}
 		if(playerY < this.getY()){
-			this.move('d');
-			//this.collisionRect.y -= this.movementSpeed * Gdx.graphics.getDeltaTime();
+			this.move('d', velocityY);
+			//this.collisionRect.y -= this.velocityY * Gdx.graphics.getDeltaTime();
 		}
 		else if(playerY > this.getY()){
-			this.move('u');
-			//this.collisionRect.y += this.movementSpeed * Gdx.graphics.getDeltaTime();
+			this.move('u', velocityY);
+			//this.collisionRect.y += this.velocityY * Gdx.graphics.getDeltaTime();
 		}
 		//this.move("slime");
 		//System.out.println("trying to move" + this.collisionRect.height);

@@ -20,8 +20,10 @@ public class Slime extends Monster{
 		// TODO Auto-generated method stub
 		this.health = 2 + PlayScreen.floorLevel * 5;
 		this.meeleeDamage[1] = 3 + (PlayScreen.floorLevel * 2);
-		
+		this.movementSpeed = 5 + 2 * PlayScreen.floorLevel;
+		this.hitPause = 1.0f - (PlayScreen.floorLevel-1) * 0.2f;
 		return 3;
+		
 	}
 
 

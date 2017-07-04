@@ -339,6 +339,7 @@ public class MenuScreen implements Screen, InputProcessor{
 			if(buttonName == "Start"){//start with character
 				main.fadeOut = true;
 				System.out.println("fade code is start");
+				
 				main.fadeCodename = "Start";
 
 			}
@@ -359,6 +360,7 @@ public class MenuScreen implements Screen, InputProcessor{
 				//play with character
 				
 				main.setScreen(main.playScreen);
+				main.playScreen.reset();
 				main.fadeIn = true;
 			}
 		}
