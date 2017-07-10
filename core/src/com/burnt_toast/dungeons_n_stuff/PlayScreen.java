@@ -18,6 +18,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
+import com.burnt_toast.dungeons_n_stuff.MonsterPlaceholder.MonsType;
 import com.burnt_toast.dungeons_n_stuff.monsters.Slime;
 import com.burnt_toast.monster_generator.Pool;
 
@@ -38,6 +39,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	private static Rectangle tempRect;
 	
 	public static int floorLevel;
+	public static int score;
 	private TiledMapTileLayer map;
 	//hud
 	private TextureRegion healthBar;
@@ -137,7 +139,12 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-
+		gameOver = false;
+		floorLevel = 1;
+		activePlaceholders.clear();
+		activeSlimes.clear();
+		
+		//currentPlayer.setHealth(curren);
 		otmr.setMap(mazeMap);
 		main.fadeIn = true;
 		main.fadeOut = false;
@@ -166,7 +173,10 @@ public class PlayScreen implements Screen, InputProcessor{
 				loadMap();
 				main.fadeIn=true;
 		}
-		
+		if(main.fadeTracker == 0 && main.fadeCodename.equals("reset")){
+			main.setScreen(main.menuScreen);
+			main.fadeIn = true;
+		}
 		//ERIC
 		otmr.setView(orthoCam);
 		playStage.act();
@@ -191,20 +201,20 @@ public class PlayScreen implements Screen, InputProcessor{
 		else{
 			playStage.getBatch().draw(MainFrame.buttonFrames[0], buttonRect.getX(), buttonRect.getY());
 		}
-		
-		currentPlayer.draw((SpriteBatch)playStage.getBatch());
-		//draw the test slime
-		
 		for(Slime sl: activeSlimes){
 			sl.draw((SpriteBatch)playStage.getBatch());
 		}
+		currentPlayer.draw((SpriteBatch)playStage.getBatch());
+		//draw the test slime
+		
+
 		for(MonsterPlaceholder m: activePlaceholders){
 			if(m!= null)
 			m.draw((SpriteBatch)playStage.getBatch());
 		}
 
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
-		main.gameFont.draw(playStage.getBatch(), "Floor Level: " + floorLevel, 0, 0);
+		main.gameFont.draw(playStage.getBatch(), "VER 0.L 7/5/2017", 0, 0);
 
 		playStage.getBatch().end();
 		
@@ -219,6 +229,8 @@ public class PlayScreen implements Screen, InputProcessor{
 				hudStage.getHeight()-35+2,
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
 		miniMap.draw((SpriteBatch)hudStage.getBatch());
+		
+		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
 		hudStage.getBatch().end();
 		
 		if(currentPlayer.health <= 0){
@@ -241,9 +253,13 @@ public class PlayScreen implements Screen, InputProcessor{
 			
 			for(int i = 0; i < activeSlimes.size(); i++){
 				activeSlimes.get(i).update(currentPlayer);
-				if(!activeSlimes.get(i).getIfInUse()){
+				if(!activeSlimes.get(i).getIfInUse()){//if it's no longer alive then
+					generateHealthAt(activeSlimes.get(i).getX(), activeSlimes.get(i).getY());
 					activeSlimes.get(i).retire();
+					score += 20 + 5*floorLevel;//higher score addition every floor
+
 					activeSlimes.remove(i);
+					
 				}
 			}
 			for(MonsterPlaceholder m: activePlaceholders){
@@ -253,15 +269,23 @@ public class PlayScreen implements Screen, InputProcessor{
 				if(activePlaceholders.get(i).getIfActivated()){
 					//remove the placholder from the linked list here
 					activePlaceholders.get(i).toggleInUse();
-					this.activeSlimes.add(slimePool.getObject());
-					if(activeSlimes.getLast() == null){//if there were none in the pool
-						System.out.println("Yeah");
-						activeSlimes.removeLast();
-						activeSlimes.add(new Slime(slimePool));
-					}//end if slime is null
-					activeSlimes.getLast().calcHealth();
-					activeSlimes.getLast().toggleInUse();
-					activePlaceholders.get(i).copyInfo(activeSlimes.getLast());//pass the info along
+					if(activePlaceholders.get(i).getMonsType() == MonsterPlaceholder.MonsType.SLIME){
+						this.activeSlimes.add(slimePool.getObject());
+						if(activeSlimes.getLast() == null){//if there were none in the pool
+							//System.out.println("Yeah");
+							activeSlimes.removeLast();
+							activeSlimes.add(new Slime(slimePool));
+						}//end if slime is null
+						activeSlimes.getLast().calcHealth();
+						activeSlimes.getLast().toggleInUse();
+						activePlaceholders.get(i).copyInfo(activeSlimes.getLast());//pass the info along
+					}
+					if(activePlaceholders.get(i).getMonsType() == MonsType.HP){
+						currentPlayer.heal(2 + floorLevel);
+						if(currentPlayer.getHealth() > currentPlayer.getMaxHealth()){
+							currentPlayer.setHealth(currentPlayer.getMaxHealth());
+						}
+					}
 					activePlaceholders.get(i).retire();
 					activePlaceholders.remove(i);
 				}
@@ -278,7 +302,9 @@ public class PlayScreen implements Screen, InputProcessor{
 			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
 				pause = true;
 				main.fadeOut = true;
+				main.fadeIn = false;
 				main.fadeCodename = "next level";
+				score += 100;
 			}
 		}//end if not pause
 
@@ -368,19 +394,17 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		currentPlayer.setPosition(3 * MainFrame.TILE_SIZE, 3 * MainFrame.TILE_SIZE);
 		currentPlayer.setDirection('u');//up at default.
+		System.out.println("ACTIVATED FIRST BLOCK");
 		miniMap.activateBlock(1, 1, this);
 		pause = false;
 		this.doorButtonPressed = false;
+		if(floorLevel >=6) currentPlayer.maxHealth = 100;
 	}//end load map
 	public void buttonCode(String buttonName){
 		
 	}
 	
-	public void reset(){
-		gameOver = false;
-		floorLevel = 1;
-		this.show();
-	}
+
 	
 	//check collision
 	public static boolean checkCollisionAt(float x, float y,float width, float height){
@@ -447,16 +471,30 @@ public class PlayScreen implements Screen, InputProcessor{
 			characterHash.get(key).clear();
 		}
 	}
+	public void generateHealthAt(float x, float y){
+		if(Math.random() >= (0.5/*currentPlayer.getHealth()/currentPlayer.maxHealth*/)){
+			activePlaceholders.add(placeholderPool.getObject());
+			if(activePlaceholders.getLast() == null){
+				activePlaceholders.removeLast();
+				activePlaceholders.add(new MonsterPlaceholder(x, y, 
+						MainFrame.TILE_SIZE/*sight radius*/, this.hpTag, placeholderPool/*pool that it belongs to*/));
+			}
+			activePlaceholders.getLast().setSightRadius(MainFrame.TILE_SIZE);
+			activePlaceholders.getLast().setImage(this.hpTag);
+			activePlaceholders.getLast().setMonsType(MonsType.HP);
+		}
+	}
 	public void generateMonsterAt(float x, float y){
-		if(Math.random() >= (0.9 - 0.1 * floorLevel)){
-		activePlaceholders.add(placeholderPool.getObject());
+		if(Math.random() >= (0.9 - 0.1 * 2/*was originially the floor level. TEMP*/)){
+		activePlaceholders.add(placeholderPool.getObject());//
 		if(activePlaceholders.getLast() == null){
 			activePlaceholders.removeLast();
 			activePlaceholders.add(new MonsterPlaceholder(x + MainFrame.TILE_SIZE, y + MainFrame.TILE_SIZE,
-						3 * floorLevel * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
+						(3  + floorLevel) * MainFrame.TILE_SIZE/*sight radius*/, MainFrame.slimeFrames[0], placeholderPool));
 		}
+		activePlaceholders.getLast().setSightRadius((3+floorLevel) * MainFrame.TILE_SIZE);
 		activePlaceholders.getLast().setImage(MainFrame.slimeFrames[0]);
-		System.out.println(currentPlayer.getMovementSpeed());
+		activePlaceholders.getLast().setMonsType(MonsType.SLIME);
 		}
 	}
 	
@@ -511,12 +549,21 @@ public class PlayScreen implements Screen, InputProcessor{
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
 		if(keycode == Keys.SPACE){
-			if(gameOver){
-				main.setScreen(main.menuScreen);
-				return true;
-			}
+//			if(gameOver){
+//				main.setScreen(main.menuScreen);
+//				main.fadeIn = true;
+//				main.fadeOut = false;
+//				return true;
+//			}
 			currentPlayer.attack();
 			return true;
+		}
+		if(keycode == Keys.ENTER){
+			if(gameOver){
+				main.fadeOut = true;
+				main.fadeIn = false;
+				return true;
+			}
 		}
 		else if(keycode == Keys.W){
 			currentPlayer.setDirection('u');

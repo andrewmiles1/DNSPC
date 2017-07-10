@@ -85,7 +85,8 @@ public abstract class Character extends Poolable{
 					){//if no collision.
 
 				this.collisionRect.y += (custSpeed == -1? this.movementSpeed : custSpeed) * Gdx.graphics.getDeltaTime();
-				
+			}
+			else{
 			}
 		}
 		else if(direction == 'd'){

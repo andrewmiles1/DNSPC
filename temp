@@ -1,0 +1,15 @@
+;lksajfl;kjasl;dkjfl;kasje;gij
+
+	private Label damageLab;
+	private Label healthLab;
+	private Label speedLab;
+	private Label moneyLab;
+	private Label attackRadLab;//attack radius
+	private Label floorNScoreLab;
+	private DungeonButton damageUpg;
+	private DungeonButton healthUpg;
+	private DungeonButton speedUpg;
+	private DungeonButton attackRadUpg;
+	private DungeonButton nextLvBut;
+	
+	

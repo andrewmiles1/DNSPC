@@ -21,8 +21,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.burnt_toast.toast_layout.Label;
 import com.burnt_toast.toast_layout.MenuLayout;
 import com.burnt_toast.toast_layout.Sheet;
+import com.burnt_toast.toast_layout.Sheet.Allignment;
 import com.dungeons_n_stuff.dungeon_layout.DungeonButton;
 
 public class MenuScreen implements Screen, InputProcessor{
@@ -36,11 +38,25 @@ public class MenuScreen implements Screen, InputProcessor{
 	
 	private MenuLayout mainMenu;//play and options buttons.
 	private MenuLayout characterPick;//choose your character
-	private MenuLayout loadingNControls;//loads the level and shows controls
+	private MenuLayout upgradeMenu;//choose the upgrades between levels
 	private MenuLayout currentLayout;
 	
 	private DungeonButton playButton;
 	private DungeonButton optionsButton;
+	
+	//upgrade menu stuff.
+	private Label damageLab;
+	private Label healthLab;
+	private Label speedLab;
+	private Label moneyLab;
+	private Label attackRadLab;//attack radius
+	private Label floorNScoreLab;
+	private DungeonButton damageUpg;
+	private DungeonButton healthUpg;
+	private DungeonButton speedUpg;
+	private DungeonButton attackRadUpg;
+	private DungeonButton nextLvBut;
+	
 	
 	//character pick stuff
 	private DungeonButton archerButton;
@@ -89,12 +105,12 @@ public class MenuScreen implements Screen, InputProcessor{
 		//menu layouts
 		mainMenu = new MenuLayout();
 		characterPick = new MenuLayout();
-		loadingNControls = new MenuLayout();
+		upgradeMenu = new MenuLayout();
 		currentLayout = mainMenu;
 		
 		//buttons
 		playButton = new DungeonButton("Play", passedMain);
-		playButton.setWindowSize(MainFrame.TILE_SIZE * 10, MainFrame.TILE_SIZE * 4);
+		playButton.setWindowSize(MainFrame.TILE_SIZE * 20, MainFrame.TILE_SIZE * 4);
 		//"0 + " because the tiledmap always is rendered at 0. No other way to render another way.
 		playButton.setWindowCoords(0 + 11 * MainFrame.TILE_SIZE - 2,  0 + 8 * MainFrame.TILE_SIZE);
 		playButton.setBorderScale(2);
@@ -102,13 +118,17 @@ public class MenuScreen implements Screen, InputProcessor{
 		playButton.setTextSize(2);
 		mainMenu.addSheet(playButton);
 		
-		optionsButton = new DungeonButton("Options", passedMain);
-		optionsButton.setWindowSize(MainFrame.TILE_SIZE * 10, MainFrame.TILE_SIZE * 4);
-		optionsButton.setWindowCoords(0 + 21 * MainFrame.TILE_SIZE + 2, 0 + 8 * MainFrame.TILE_SIZE);
-		optionsButton.setBorderScale(2);
-		optionsButton.setTextColor(Color.WHITE);
-		optionsButton.setTextSize(2);
-		mainMenu.addSheet(optionsButton);
+//		optionsButton = new DungeonButton("Options", passedMain);
+//		optionsButton.setWindowSize(MainFrame.TILE_SIZE * 10, MainFrame.TILE_SIZE * 4);
+//		optionsButton.setWindowCoords(0 + 21 * MainFrame.TILE_SIZE + 2, 0 + 8 * MainFrame.TILE_SIZE);
+//		optionsButton.setBorderScale(2);
+//		optionsButton.setTextColor(Color.WHITE);
+//		optionsButton.setTextSize(2);
+//		mainMenu.addSheet(optionsButton);
+		
+		//UPGRADE MENU SCREEN
+		
+		
 		
 		//CHARACTER PICK SCREEN
 		animationTimer = 0;
@@ -152,6 +172,9 @@ public class MenuScreen implements Screen, InputProcessor{
 		
 		System.out.println(widthWithZoom);
 		
+		//UPGRADE MENU
+		damageLab = new Label(20, 200, "TEST LABEL", Allignment.CUSTOM, 10);
+		
 		//current selection frame
 		//meele label
 		//ranged label
@@ -181,7 +204,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		System.out.println(widthWithZoom);
 		menuStage.getViewport().apply();
 		main.addInputProcessor(this);
-		selectedClass = "nonelol";//no classes have been selected yet.
+		selectedClass = "nonelol";//no classes have been selected yet. //update: default selected class is warrior
 		
 		System.out.println(((OrthographicCamera)(menuStage.getCamera())).zoom);
 		
@@ -346,7 +369,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		}
 	}
 	public void fadeCode(String fadeCodename){
-		if(fadeCodename != "null")System.out.println("Fade Codename: " + fadeCodename);
+		//if(fadeCodename != "null")System.out.println("Fade Codename: " + fadeCodename);
 		if(currentLayout == mainMenu){
 
 			if(fadeCodename == "play"){
@@ -360,8 +383,8 @@ public class MenuScreen implements Screen, InputProcessor{
 				//play with character
 				
 				main.setScreen(main.playScreen);
-				main.playScreen.reset();
 				main.fadeIn = true;
+				main.fadeOut = false;
 			}
 		}
 	}

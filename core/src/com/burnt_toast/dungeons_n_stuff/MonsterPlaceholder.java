@@ -17,7 +17,7 @@ public class MonsterPlaceholder extends Poolable{
 	private Vector3 tempRect;
 	private MonsType myType;
 	
-	public enum MonsType{SLIME, WIZARD}
+	public enum MonsType{SLIME, WIZARD, HP}
 	
 	
 	public MonsterPlaceholder(float passX, float passY,
@@ -37,7 +37,12 @@ public class MonsterPlaceholder extends Poolable{
 		if(health != 0)
 			sl.setHealth(this.health);
 	}
-	
+	public void setSightRadius(float passSight){
+		this.sightRadius = passSight;
+	}
+	public float getSightRadius(){
+		return this.sightRadius;
+	}
 	public void setX(float passX){
 		x = passX;
 	}

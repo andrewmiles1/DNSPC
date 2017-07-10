@@ -37,11 +37,12 @@ public class Warrior extends Player{
 			}//end if
 			else if(direction == 'u' || direction == 'd'){
 			batch.draw(MainFrame.warriorFrames[2], 					
-					(direction=='d')? meleeRect.x + meleeSizeX:meleeRect.x,
-					meleeRect.y,
+					(direction=='d')? meleeRect.x:meleeRect.x,
+					(direction == 'd')?(meleeRect.y + 8): meleeRect.y,
 					 0, 0,
-					MainFrame.warriorFrames[2].getRegionWidth(),
-					//(direction == 'u')?if flipped y
+					 (direction == 'd')?//if flipped y
+					MainFrame.warriorFrames[2].getRegionWidth()*-1 : MainFrame.warriorFrames[2].getRegionWidth(),
+
 					MainFrame.warriorFrames[2].getRegionHeight()*-1, 1, 1, 90);
 			}//emd else
 			batch.setColor(1, 1, 1, 1);
