@@ -164,7 +164,14 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		if(main.fadeIn || main.fadeOut){
 			//if fading
-			main.updateFade();
+			switch(main.updateFade()){
+			case "next level":
+				
+				break;
+			case "game over":
+				
+				break;
+			}
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
 		}
@@ -381,7 +388,12 @@ public class PlayScreen implements Screen, InputProcessor{
 //			}
 //			System.out.println();
 //		}
-
+		if(gameOver){
+			gameOver = false;
+			pause = false;
+			floorLevel = 1;
+		}
+		//I decided to change it to plus
 		collisionMap = mapTool.prepareMap(4 + (2*(PlayScreen.floorLevel-1)));
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
 		

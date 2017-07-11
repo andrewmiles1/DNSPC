@@ -173,8 +173,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		System.out.println(widthWithZoom);
 		
 		//UPGRADE MENU
-		damageLab = new Label(20, 200, "TEST LABEL", Allignment.CUSTOM, 10);
-		
+		damageLab = new Label(MainFrame.SCREEN_WIDTH/8, MainFrame.SCREEN_HEIGHT/6 * 2, "TEST LABEL", Allignment.CUSTOM, 10);
 		//current selection frame
 		//meele label
 		//ranged label
@@ -194,8 +193,9 @@ public class MenuScreen implements Screen, InputProcessor{
 		// TODO Auto-generated method stub
 		main.fadeIn = true;
 		main.fadeOut = false;
-
-
+		if(main.fadeCodename.equals("next level")){
+			currentLayout = upgradeMenu;
+		}
 	
 		//move camera to place not viewport mmk
 		menuStage.getCamera().update();
@@ -259,6 +259,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		menuStage.getBatch().begin();
 		currentLayout.draw((SpriteBatch) menuStage.getBatch(), main.gameFont);
 		if(currentLayout == characterPick)this.actionsPerRenderCharPick();
+		if(currentLayout == upgradeMenu)damageLab.draw((SpriteBatch)menuStage.getBatch());
 		currentLayout.update(temp);
 		menuStage.getBatch().end();
 		

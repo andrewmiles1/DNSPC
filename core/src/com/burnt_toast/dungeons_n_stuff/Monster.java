@@ -104,22 +104,33 @@ public abstract class Monster extends Character{
 		totalDistance = Math.abs(distanceX) + Math.abs(distanceY);
 		velocityX = (distanceX / totalDistance) * movementSpeed;
 		velocityY = (distanceY / totalDistance) * movementSpeed;
-		if(playerX < this.getX()){
-			this.move('l', velocityX);
-			//this.collisionRect.x -= this.velocityX * Gdx.graphics.getDeltaTime();
-		}
-		else if(playerX > this.getX()){
-			this.move('r', velocityX);
-			//this.collisionRect.x += this.velocityX * Gdx.graphics.getDeltaTime();
-		}
-		if(playerY < this.getY()){
-			this.move('d', velocityY);
-			//this.collisionRect.y -= this.velocityY * Gdx.graphics.getDeltaTime();
-		}
-		else if(playerY > this.getY()){
-			this.move('u', velocityY);
-			//this.collisionRect.y += this.velocityY * Gdx.graphics.getDeltaTime();
-		}
+
+			if(playerX < this.getX()){
+				if(!this.move('l', velocityX)){
+					this.direction = 'l';
+					velocityY += velocityX;
+				}
+				else this.direction = 'l';//it was able to move, make it l
+				//this.collisionRect.x -= this.velocityX * Gdx.graphics.getDeltaTime();
+			}
+			else if(playerX > this.getX()){
+				if(!this.move('r', velocityX)){
+					this.direction = 'r';
+					velocityY += velocityX;
+				}
+				else this.direction = 'r';//it was able to move 
+				//this.collisionRect.x += this.velocityX * Gdx.graphics.getDeltaTime();
+			}
+			if(playerY < this.getY()){
+				if(!this.move('d', velocityY)){
+					this.move(this.direction, velocityY);//it it can't move, 
+				}
+				//this.collisionRect.y -= this.velocityY * Gdx.graphics.getDeltaTime();
+			}
+			else if(playerY > this.getY()){
+				this.move('u', velocityY);
+				//this.collisionRect.y += this.velocityY * Gdx.graphics.getDeltaTime();
+			}
 		//this.move("slime");
 		//System.out.println("trying to move" + this.collisionRect.height);
 		//collision and stuff math

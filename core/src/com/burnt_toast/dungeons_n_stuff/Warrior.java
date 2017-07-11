@@ -18,12 +18,7 @@ public class Warrior extends Player{
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
 		//if flipped, then it draws, if not, then it doesn't draw flipped. long function holy macaroni.
-		batch.draw(MainFrame.warriorFrames[animationIndex],
-				flipped? collisionRect.x + MainFrame.warriorFrames[animationIndex].getRegionWidth():collisionRect.x,
-				collisionRect.y,
-				flipped?
-				MainFrame.warriorFrames[animationIndex].getRegionWidth()*-1:MainFrame.warriorFrames[animationIndex].getRegionWidth(),
-				MainFrame.warriorFrames[animationIndex].getRegionHeight());
+
 		if(attackTimer > 0 ){//if we're attacking
 			batch.setColor(1, 1, 1, attackTimer/attackMaxTime*0.75f);
 			
@@ -38,7 +33,7 @@ public class Warrior extends Player{
 			else if(direction == 'u' || direction == 'd'){
 			batch.draw(MainFrame.warriorFrames[2], 					
 					(direction=='d')? meleeRect.x:meleeRect.x,
-					(direction == 'd')?(meleeRect.y + 8): meleeRect.y,
+					(direction == 'd')?(meleeRect.y + 8): meleeRect.y + 3,
 					 0, 0,
 					 (direction == 'd')?//if flipped y
 					MainFrame.warriorFrames[2].getRegionWidth()*-1 : MainFrame.warriorFrames[2].getRegionWidth(),
@@ -48,6 +43,12 @@ public class Warrior extends Player{
 			batch.setColor(1, 1, 1, 1);
 			
 		}
+		batch.draw(MainFrame.warriorFrames[animationIndex],
+				flipped? collisionRect.x + MainFrame.warriorFrames[animationIndex].getRegionWidth():collisionRect.x,
+				collisionRect.y,
+				flipped?
+				MainFrame.warriorFrames[animationIndex].getRegionWidth()*-1:MainFrame.warriorFrames[animationIndex].getRegionWidth(),
+				MainFrame.warriorFrames[animationIndex].getRegionHeight());
 		//this 2 line of code shows where the melee rect is at 
 		//batch.draw(MainFrame.silverFrame, meleeRect.x, meleeRect.y, meleeRect.getWidth(),
 				//meleeRect.getHeight());

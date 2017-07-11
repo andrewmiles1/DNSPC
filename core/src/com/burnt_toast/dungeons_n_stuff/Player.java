@@ -85,10 +85,10 @@ public class Player extends Character {
 	}
 
 	@Override
-	public void move() {
+	public boolean move() {
 		super.move();
 		if (direction == 'u') {
-			meleeRect.y = collisionRect.y + frameSizeY;
+			meleeRect.y = collisionRect.y + collisionRect.height;
 			meleeRect.x = collisionRect.x - (Math.abs(collisionRect.getWidth() - meleeRect.getWidth()) / 2);
 		} else if (direction == 'd') {
 			meleeRect.y = collisionRect.y - meleeRect.height;
@@ -101,6 +101,7 @@ public class Player extends Character {
 			meleeRect.x = collisionRect.x - meleeRect.width;
 			meleeRect.y = collisionRect.y - (Math.abs(collisionRect.getHeight() - meleeRect.getHeight()) / 2);
 		}
+		return true;
 	}
 	
 	public void update(){
