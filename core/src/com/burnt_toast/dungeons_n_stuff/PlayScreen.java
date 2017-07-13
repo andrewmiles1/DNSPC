@@ -79,6 +79,8 @@ public class PlayScreen implements Screen, InputProcessor{
 	private Rectangle buttonRect;
 	private AnimatedObject endDoor;
 	private boolean doorButtonPressed;
+
+	private String tempStr;
 	
 	
 	public PlayScreen(MainFrame passedMain){
@@ -100,7 +102,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		//DRAG STUFF
 		dragCoordsThisFrame = new Vector2();
 		dragCoordsLastFrame = new Vector2();
-		dragDeadZoneSame = 10;//just a beginners estimate
+		dragDeadZoneSame = 5;//just a beginners estimate
 		dragDeadZoneOpposite = 3;
 		touchCoordsTemp = new Vector2();
 		
@@ -164,13 +166,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		if(main.fadeIn || main.fadeOut){
 			//if fading
-			switch(main.updateFade()){
-			case "next level":
-				
-				break;
-			case "game over":
-				
-				break;
+			tempStr = main.updateFade();
+
+			if (tempStr.equals("next level")) {
+
+			}
+			else if(tempStr.equals("game over")){
+
 			}
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
@@ -652,7 +654,6 @@ public class PlayScreen implements Screen, InputProcessor{
 		touchCoordsTemp.x = screenX;
 		touchCoordsTemp.y = screenY;
 		playStage.getViewport().unproject(touchCoordsTemp);
-		System.out.println(screenX);
 		if(screenX < Gdx.graphics.getWidth() / 2){
 			//if its on the left side,
 			currentPlayer.setIfMoving(true);//start moving
@@ -674,7 +675,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		touchCoordsTemp.x = screenX;
 		touchCoordsTemp.y = screenY;
 		playStage.getViewport().unproject(touchCoordsTemp);
-		if(touchCoordsTemp.x < Gdx.graphics.getWidth() / 2){
+		if(screenX < Gdx.graphics.getWidth() / 2){
 			//if its on the left side,
 			currentPlayer.setIfMoving(false);//stop moving, 
 			dragCoordsThisFrame.x = -1;
@@ -686,32 +687,35 @@ public class PlayScreen implements Screen, InputProcessor{
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		if(dragCoordsLastFrame.x == -1){
-			dragCoordsLastFrame.x = dragCoordsThisFrame.x;
-			dragCoordsLastFrame.y = dragCoordsThisFrame.y;
-			dragCoordsThisFrame.x = screenX; dragCoordsThisFrame.y = screenY;//set this frame's
-			hudStage.getViewport().unproject(dragCoordsThisFrame);
-		}
-		else{
-			dragCoordsLastFrame.x = dragCoordsThisFrame.x;
-			dragCoordsLastFrame.y = dragCoordsThisFrame.y;
-			dragCoordsThisFrame.x = screenX; dragCoordsThisFrame.y = screenY;//set this frame's
-			hudStage.getViewport().unproject(dragCoordsThisFrame);
-			dragDifX = dragCoordsThisFrame.x - dragCoordsLastFrame.x;//difference of x drags.
-			dragDifY = dragCoordsThisFrame.y - dragCoordsLastFrame.y;//difference of y drags.
-		}
-		System.out.println(dragDifX + ", " + dragDifY);
 
-		if (dragCoordsThisFrame.x > widthWithZoom/2){
-			//currentPlayer.setIfMoving(false);//they dragged out of moving
-			//System.out.println(screenX + ", " + screenY + ", " + (widthWithZoom/2));
-		}
-		if(currentPlayer.getIfMoving() == false && dragCoordsThisFrame.x < widthWithZoom/2){
-			//if they're not moving and they dragged into the moving, then move.
-			//currentPlayer.setIfMoving(true);
-		}
-		
-		if(dragCoordsThisFrame.x < Gdx.graphics.getWidth()/2){//in moving bounds.
+		if(screenX < Gdx.graphics.getWidth() / 2) {
+			if (dragCoordsLastFrame.x == -1) {
+				dragCoordsLastFrame.x = dragCoordsThisFrame.x;
+				dragCoordsLastFrame.y = dragCoordsThisFrame.y;
+				dragCoordsThisFrame.x = screenX;
+				dragCoordsThisFrame.y = screenY;//set this frame's
+				hudStage.getViewport().unproject(dragCoordsThisFrame);
+			} else {
+				dragCoordsLastFrame.x = dragCoordsThisFrame.x;
+				dragCoordsLastFrame.y = dragCoordsThisFrame.y;
+				dragCoordsThisFrame.x = screenX;
+				dragCoordsThisFrame.y = screenY;//set this frame's
+				hudStage.getViewport().unproject(dragCoordsThisFrame);
+				dragDifX = dragCoordsThisFrame.x - dragCoordsLastFrame.x;//difference of x drags.
+				dragDifY = dragCoordsThisFrame.y - dragCoordsLastFrame.y;//difference of y drags.
+			}
+			System.out.println(dragDifX + ", " + dragDifY);
+
+			if (dragCoordsThisFrame.x > widthWithZoom / 2) {
+				//currentPlayer.setIfMoving(false);//they dragged out of moving
+				//System.out.println(screenX + ", " + screenY + ", " + (widthWithZoom/2));
+			}
+			if (currentPlayer.getIfMoving() == false && dragCoordsThisFrame.x < widthWithZoom / 2) {
+				//if they're not moving and they dragged into the moving, then move.
+				//currentPlayer.setIfMoving(true);
+			}
+
+			if (dragCoordsThisFrame.x < Gdx.graphics.getWidth() / 2) {//in moving bounds.
 			/*if(currentPlayer.getDirection() == 'r'){//GOING RIGHT
 				if((dragDifX + dragChangeX) > dragChangeX && Math.abs(dragChangeY) < dragDeadZoneOpposite){//we're going right. minus because diff would be negative
 					//if we're going right then reset if it's negative
@@ -727,7 +731,7 @@ public class PlayScreen implements Screen, InputProcessor{
 						currentPlayer.setDirection('l');//lol yeah we goin' left
 						dragChangeY = 0;//reset the other so it doesn't trip.
 					}
-					
+
 					dragChangeY += dragDifY;//add to y any differences. even if goes up or down no big deal
 					if (dragChangeY > dragDeadZoneOpposite){//if dragging up
 						currentPlayer.setDirection('u');//we goin' up
@@ -739,91 +743,86 @@ public class PlayScreen implements Screen, InputProcessor{
 					}
 				}
 			}//END GOING RIGHT*/
-			if(currentPlayer.getDirection() == 'r'){//GOING RIGHT
-				if(Math.abs(dragDifY) >= Math.abs(dragDifX)){//if y is bigger
-					if(Math.abs(dragDifX) > dragDeadZoneOpposite){//if y is greater than dead zone
-						if(dragDifY > 0){
-							//going up
-							currentPlayer.setDirection('u');
+				if (currentPlayer.getDirection() == 'r') {//GOING RIGHT
+					if (Math.abs(dragDifY) >= Math.abs(dragDifX)) {//if y is bigger
+						if (Math.abs(dragDifX) > dragDeadZoneOpposite) {//if y is greater than dead zone
+							if (dragDifY > 0) {
+								//going up
+								currentPlayer.setDirection('u');
+							} else {
+								currentPlayer.setDirection('d');
+							}
 						}
-						else{
-							currentPlayer.setDirection('d');
+					} else {
+						if (dragDifX < dragDeadZoneSame * -1)
+							//going left
+							currentPlayer.setDirection('l');
+					}
+
+				}//END GOING RIGHT
+				if (currentPlayer.getDirection() == 'l') {//GOING LEFT
+					if (Math.abs(dragDifY) >= Math.abs(dragDifX)) {//if y diff is bigger than x
+						if (Math.abs(dragDifY) > dragDeadZoneOpposite) {
+							if (dragDifY > 0) {
+								//going up
+								currentPlayer.setDirection('u');//set up
+							}
+							if (dragDifY < 0) {
+								//going down
+								currentPlayer.setDirection('d');
+							}
+						}
+					} else {
+						if (dragDifX > dragDeadZoneSame) {
+							//going right
+							currentPlayer.setDirection('r');
 						}
 					}
-				}
-				else{
-					if(dragDifX < dragDeadZoneSame*-1)
-						//going left
-						currentPlayer.setDirection('l');
-				}
-				
-			}//END GOING RIGHT
-			if(currentPlayer.getDirection() == 'l'){//GOING LEFT
-				if(Math.abs(dragDifY) >= Math.abs(dragDifX)){//if y diff is bigger than x
-					if(Math.abs(dragDifY) > dragDeadZoneOpposite){
-						if(dragDifY > 0){
-							//going up
-							currentPlayer.setDirection('u');//set up
+
+				}//END GOING LEFT
+				if (currentPlayer.getDirection() == 'u') {//GOING UP
+					if (Math.abs(dragDifX) >= Math.abs(dragDifY)) {//if x diff is bigger than y
+						if (Math.abs(dragDifX) > dragDeadZoneOpposite) {
+							if (dragDifX > 0) {
+								//going right
+								currentPlayer.setDirection('r');//set right
+							}
+							if (dragDifX < 0) {
+								//going left
+								currentPlayer.setDirection('l');
+							}
 						}
-						if(dragDifY < 0){
+					} else {
+						if (dragDifY < dragDeadZoneSame * -1) {
 							//going down
 							currentPlayer.setDirection('d');
 						}
 					}
-				}
-				else{
-					if(dragDifX > dragDeadZoneSame){
-						//going right
-						currentPlayer.setDirection('r');
-					}
-				}
-				
-			}//END GOING LEFT
-			if(currentPlayer.getDirection() == 'u'){//GOING UP
-				if(Math.abs(dragDifX) >= Math.abs(dragDifY)){//if y diff is bigger than x
-					if(Math.abs(dragDifX) > dragDeadZoneOpposite){
-						if(dragDifX > 0){
-							//going right
-							currentPlayer.setDirection('r');//set right
+
+				}//END GOING UP
+				if (currentPlayer.getDirection() == 'd') {//GOING DOWN
+					if (Math.abs(dragDifX) >= Math.abs(dragDifY)) {//if x diff is bigger than y
+						if (Math.abs(dragDifX) > dragDeadZoneOpposite) {
+							if (dragDifX > 0) {
+								//going right
+								currentPlayer.setDirection('r');//set right
+							}
+							if (dragDifX < 0) {
+								//going left
+								currentPlayer.setDirection('l');
+							}
 						}
-						if(dragDifX < 0){
-							//going left
-							currentPlayer.setDirection('l');
-						}
-					}
-				}
-				else{
-					if(dragDifY < dragDeadZoneSame*-1){
-						//going down
-						currentPlayer.setDirection('d');
-					}
-				}
-				
-			}//END GOING UP
-			if(currentPlayer.getDirection() == 'd'){//GOING DOWN
-				if(Math.abs(dragDifX) >= Math.abs(dragDifY)){//if y diff is bigger than x
-					if(Math.abs(dragDifX) > dragDeadZoneOpposite){
-						if(dragDifX > 0){
-							//going right
-							currentPlayer.setDirection('r');//set right
-						}
-						if(dragDifX < 0){
-							//going left
-							currentPlayer.setDirection('l');
+					} else {
+						if (dragDifY > dragDeadZoneSame) {
+							//going up
+							currentPlayer.setDirection('u');
 						}
 					}
-				}
-				else{
-					if(dragDifY > dragDeadZoneSame){
-						//going up
-						currentPlayer.setDirection('u');
-					}
-				}
-				
-			}//END GOING DOWN
-		}//END IF IN MOVING BOUNDS
-		
-		
+
+				}//END GOING DOWN
+			}//END IF IN MOVING BOUNDS
+
+		}
 		
 		return false;
 	}

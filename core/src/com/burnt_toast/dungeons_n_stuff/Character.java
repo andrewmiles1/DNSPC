@@ -58,6 +58,7 @@ public abstract class Character extends Poolable{
 	public boolean getIfMoving(){return isMoving;}
 	public char getDirection(){return direction;}
 	public void setDirection(char passDirection){
+		System.out.println("CALLED");
 		direction = passDirection;
 		if(passDirection == 'l')flipped = true;
 		else if (passDirection == 'r') flipped = false;

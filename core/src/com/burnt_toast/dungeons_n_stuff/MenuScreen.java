@@ -84,7 +84,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		main = passedMain;
 		orthoCam = new OrthographicCamera(MainFrame.SCREEN_WIDTH, MainFrame.SCREEN_HEIGHT);
 		menuStage = new Stage(new ExtendViewport(MainFrame.SCREEN_WIDTH, MainFrame.SCREEN_HEIGHT, orthoCam));
-		menuMap = main.mapLoader.load("maps/MenuMap.tmx");
+		menuMap = main.mapLoader.load("maps/menuMap.tmx");
 		main.otmr = new OrthogonalTiledMapRenderer(menuMap);
 		
 		((OrthographicCamera)(menuStage.getCamera())).zoom -= 0.25;
