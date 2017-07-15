@@ -45,12 +45,6 @@ public class MenuScreen implements Screen, InputProcessor{
 	private DungeonButton optionsButton;
 	
 	//upgrade menu stuff.
-	private Label damageLab;
-	private Label healthLab;
-	private Label speedLab;
-	private Label moneyLab;
-	private Label attackRadLab;//attack radius
-	private Label floorNScoreLab;
 	private DungeonButton damageUpg;
 	private DungeonButton healthUpg;
 	private DungeonButton speedUpg;
@@ -59,9 +53,7 @@ public class MenuScreen implements Screen, InputProcessor{
 	
 	
 	//character pick stuff
-	private DungeonButton archerButton;
-	private DungeonButton warriorButton;
-	private DungeonButton wizardButton;
+
 	private DungeonButton playWithCharacter;
 	private String selectedClass;//used to know which class is going right now.
 	
@@ -87,7 +79,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		menuMap = main.mapLoader.load("maps/menuMap.tmx");
 		main.otmr = new OrthogonalTiledMapRenderer(menuMap);
 		
-		((OrthographicCamera)(menuStage.getCamera())).zoom -= 0.25;
+		((OrthographicCamera)(menuStage.getCamera())).zoom -= 0;//REMOVE?
 		widthWithZoom = menuStage.getWidth() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
 		heightWithZoom = menuStage.getHeight() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
 		System.out.println("MenuWidth: " + menuStage.getWidth());
@@ -126,6 +118,8 @@ public class MenuScreen implements Screen, InputProcessor{
 //		optionsButton.setTextSize(2);
 //		mainMenu.addSheet(optionsButton);
 		
+
+		
 		//UPGRADE MENU SCREEN
 		
 		
@@ -133,32 +127,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		//CHARACTER PICK SCREEN
 		animationTimer = 0;
 		
-		//archer button
-		archerButton = new DungeonButton("archer", passedMain);
-		archerButton.setWindowSize(widthWithZoom / 3 - 5, heightWithZoom / 4);
-		archerButton.setWindowCoords(0 + 5/2, heightWithZoom - heightWithZoom / 4 - 5);//first button
-		archerButton.setBorderScale(2);
-		archerButton.setDisplayButtonText(false);
-		characterPick.addSheet(archerButton);
 		
-		
-		
-		//wizard button
-		wizardButton = new DungeonButton("wizard", passedMain);
-		wizardButton.setWindowSize(widthWithZoom / 3 - 5, heightWithZoom / 4);
-		wizardButton.setWindowCoords(widthWithZoom / 3 + 5/2, heightWithZoom - heightWithZoom/4 - 5);//second button
-		wizardButton.setBorderScale(2);
-		wizardButton.setDisplayButtonText(false);
-		characterPick.addSheet(wizardButton);
-		
-		
-		//warrior button
-		warriorButton = new DungeonButton("warrior", passedMain);
-		warriorButton.setWindowSize(widthWithZoom / 3 - 5, heightWithZoom / 4);
-		warriorButton.setWindowCoords(widthWithZoom / 3 * 2 + 5/2, heightWithZoom - heightWithZoom/4 - 5);//third button
-		warriorButton.setBorderScale(2);
-		warriorButton.setDisplayButtonText(false);
-		characterPick.addSheet(warriorButton);
 		
 		
 		//PLAY button to play with selected character
@@ -207,7 +176,7 @@ public class MenuScreen implements Screen, InputProcessor{
 		System.out.println(widthWithZoom);
 		menuStage.getViewport().apply();
 		main.addInputProcessor(this);
-		selectedClass = "nonelol";//no classes have been selected yet. //update: default selected class is warrior
+		selectedClass = "warrior";//no classes have been selected yet. //update: default selected class is warrior
 		
 		System.out.println(((OrthographicCamera)(menuStage.getCamera())).zoom);
 		
@@ -262,21 +231,25 @@ public class MenuScreen implements Screen, InputProcessor{
 		menuStage.getBatch().begin();
 		currentLayout.draw((SpriteBatch) menuStage.getBatch(), main.gameFont);
 		if(currentLayout == characterPick)this.actionsPerRenderCharPick();
-		if(currentLayout == upgradeMenu)damageLab.drawLabel((SpriteBatch)menuStage.getBatch(), main.gameFont);
 		currentLayout.update(temp);
+		
+		if(currentLayout == characterPick){
+			main.gameFont.draw(menuStage.getBatch(), "Drag on the \nleft side \nto move,", 5, heightWithZoom/10 * 8);
+			main.gameFont.draw(menuStage.getBatch(), "Tap on the \nright side \nto attack.", widthWithZoom/7*5,
+					heightWithZoom/10*8);
+			main.gameFont.draw(menuStage.getBatch(), 
+					"Find the door to the next floor." + 
+					"\nMonsters get harder every floor" + 
+					"\nThe maze gets bigger every floor." + 
+					"\nYou upgrade every other floor.", 5, 
+					heightWithZoom/10 * 5);
+		}
+		
 		menuStage.getBatch().end();
 		
 
 
 		
-
-		//INPUT
-		if(Gdx.input.isKeyPressed(Keys.A)){
-			//playButton.setWindowCoords(orthoCam.position.x, orthoCam.position.y);
-
-			System.out.println(menuStage.getCamera().position.toString());
-			
-		}
 		//CALCULATE
 		temp.x = Gdx.input.getX();
 		temp.y = Gdx.input.getY();
@@ -338,32 +311,9 @@ public class MenuScreen implements Screen, InputProcessor{
 			}
 		}
 		if(currentLayout == characterPick){
-			if(buttonName == "archer"){
-				//clicked archer button
-				animationTimer = 0;
-				animationIndex = 1;
-				selectedClassButton = archerButton;
-				selectedClassFrames = main.archerFrames;
-				selectedClass = "archer";
-				main.playScreen.setCharacter('a');
-			}
-			if(buttonName  == "wizard"){
-				animationTimer = 0;
-				animationIndex = 1;
-				selectedClassButton = wizardButton;
-				selectedClassFrames = main.wizardFrames;
-				selectedClass = "wizard";
-				main.playScreen.setCharacter('w');
-			}
-			if(buttonName == "warrior"){
-				animationTimer = 0;
-				animationIndex = 1;
-				selectedClassButton = warriorButton;
-				selectedClassFrames = main.warriorFrames;
-				selectedClass = "warrior";
-				main.playScreen.setCharacter('r');
-			}
+
 			if(buttonName == "Start"){//start with character
+				main.playScreen.setCharacter('r');
 				main.fadeOut = true;
 				System.out.println("fade code is start");
 				
@@ -393,31 +343,10 @@ public class MenuScreen implements Screen, InputProcessor{
 		}
 	}
 	public void actionsPerRenderCharPick(){
-		if(selectedClass != "nonelol"){
-		menuStage.getBatch().draw(selectedClassFrames[animationIndex],
-				selectedClassButton.getX() + selectedClassButton.getWidth()/2 - selectedClassFrames[animationIndex].getRegionWidth()/2*2,
-				archerButton.getY() + archerButton.getHeight()/2 - selectedClassFrames[animationIndex].getRegionHeight()/2*2,
-				selectedClassFrames[animationIndex].getRegionWidth()*2,
-				selectedClassFrames[animationIndex].getRegionHeight()*2);
-		}
-		if(this.selectedClass != "archer"){
-			menuStage.getBatch().draw(main.archerFrames[0],
-					archerButton.getX() + archerButton.getWidth()/2 - main.archerFrames[0].getRegionWidth()/2*2,
-					archerButton.getY() + archerButton.getHeight()/2 - main.archerFrames[0].getRegionHeight()/2*2,
-					main.archerFrames[0].getRegionWidth()*2, main.archerFrames[0].getRegionHeight() * 2);
-		}
-		if(this.selectedClass != "wizard"){
-			menuStage.getBatch().draw(main.wizardFrames[0],
-					wizardButton.getX() + wizardButton.getWidth()/2 - main.wizardFrames[0].getRegionWidth()/2*2,
-					wizardButton.getY() + wizardButton.getHeight()/2 - main.wizardFrames[0].getRegionHeight()/2*2,
-					main.wizardFrames[0].getRegionWidth()*2, main.wizardFrames[0].getRegionHeight()*2);
-		}
-		if(selectedClass != "warrior"){
-			menuStage.getBatch().draw(main.warriorFrames[0],
-					warriorButton.getX() + warriorButton.getWidth()/2 - main.wizardFrames[0].getRegionWidth()/2*2, 
-					warriorButton.getY() + warriorButton.getHeight()/2 - main.wizardFrames[0].getRegionHeight()/2*2,
-					main.warriorFrames[0].getRegionWidth()*2, main.wizardFrames[0].getRegionHeight()*2);
-		}
+		menuStage.getBatch().draw(MainFrame.warriorFrames[animationIndex],
+				widthWithZoom / 2 - MainFrame.warriorFrames[0].getRegionWidth()/2 - 10,
+				heightWithZoom / 10 * 8,
+				MainFrame.warriorFrames[0].getRegionWidth()*2, MainFrame.wizardFrames[0].getRegionHeight()*2);
 	}
 
 	@Override
