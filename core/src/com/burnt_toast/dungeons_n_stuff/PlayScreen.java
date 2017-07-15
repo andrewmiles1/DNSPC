@@ -61,7 +61,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	static HashMap<Float, LinkedList<Character>> characterHash;
 	HashMap<Float, LinkedList<MonsterPlaceholder>> placeholderHash;
 	
-	//moving character drag stuff
+	//moving character DRAG STUFF
 	float dragDifX;
 	private float dragDifY;
 	private Vector2 dragCoordsThisFrame;
@@ -70,6 +70,17 @@ public class PlayScreen implements Screen, InputProcessor{
 	private float dragChangeY;
 	private float dragDeadZoneSame;
 	private float dragDeadZoneOpposite;
+
+	//NEW DRAG STUFF
+	Timer stopTimer;
+	float stoppingSpeed = 30;//the pixels per second that it guesses you're stopping
+	// /|\ 5 is a guess.
+	Vector2 stopCoords;//the last stop point
+	Vector2 movePoint;//the point the finger is at moving
+	float pixsPerSecond;
+	float moveSlope;
+	private float anchorDirection;
+
 	
 	private Vector2 touchCoordsTemp;
 	
@@ -105,6 +116,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		dragDeadZoneSame = 5;//just a beginners estimate
 		dragDeadZoneOpposite = 3;
 		touchCoordsTemp = new Vector2();
+
+//		//NEW DRAG STUFF
+//		upCoord = new Vector2(MainFrame.SCREEN_WIDTH/6, MainFrame.SCREEN_HEIGHT / 3 * 2);
+//		downCoord = new Vector2(MainFrame.SCREEN_WIDTH/6, 0);
+//		leftCoord = new Vector2(0, MainFrame.SCREEN_HEIGHT/3);
+//		rightCoord = new Vector2(MainFrame.SCREEN_WIDTH/6 * 2, MainFrame.SCREEN_HEIGHT/3);
+
 		
 		//MAP CREATION
 		mapTool = new MapCreationTool(((TiledMapTileLayer)mazeMap.getLayers().get(0)),
@@ -134,6 +152,11 @@ public class PlayScreen implements Screen, InputProcessor{
 		endDoorRect = new Rectangle(0, 0, 6, 2);
 		endDoor = new AnimatedObject(MainFrame.doorFrames, 0.05f, false, 0, 0);
 		floorLevel = 1;
+
+		//NEW DRAG STUFF
+		stopTimer = new Timer(0.0001f);
+		stopCoords = new Vector2();
+		movePoint = new Vector2();
 	}
 	
 	
@@ -238,7 +261,7 @@ public class PlayScreen implements Screen, InputProcessor{
 				hudStage.getHeight()-35+2,
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
 		miniMap.draw((SpriteBatch)hudStage.getBatch());
-		
+		hudStage.getBatch().draw(main.buttonFrames[0], stopCoords.x, stopCoords.y);
 		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
 		hudStage.getBatch().end();
 		
@@ -657,6 +680,9 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(screenX < Gdx.graphics.getWidth() / 2){
 			//if its on the left side,
 			currentPlayer.setIfMoving(true);//start moving
+			touchDragged(screenX, screenY, pointer);
+			stopCoords.x = touchCoordsTemp.x;
+			stopCoords.y = touchCoordsTemp.y;
 			return true;
 		}
 		else if(screenX > Gdx.graphics.getWidth() / 2){
@@ -684,7 +710,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		return false;
 	}
 
-
+/*
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 
@@ -716,33 +742,6 @@ public class PlayScreen implements Screen, InputProcessor{
 			}
 
 			if (dragCoordsThisFrame.x < Gdx.graphics.getWidth() / 2) {//in moving bounds.
-			/*if(currentPlayer.getDirection() == 'r'){//GOING RIGHT
-				if((dragDifX + dragChangeX) > dragChangeX && Math.abs(dragChangeY) < dragDeadZoneOpposite){//we're going right. minus because diff would be negative
-					//if we're going right then reset if it's negative
-					//if(dragChangeX < 0)dragChangeX = 0;
-					dragChangeX += dragDifX;//just add it I guess. Don't really do anything.
-					dragChangeY += dragDifY;
-				}
-				else{//we're going right but they dragged otherwize or equal to
-					if(dragChangeX > 0)dragChangeX = 0; //deal with it we might go another way.
-					dragChangeX += dragDifX;//
-					if(dragChangeX < (dragDeadZoneSame * -1))
-					{
-						currentPlayer.setDirection('l');//lol yeah we goin' left
-						dragChangeY = 0;//reset the other so it doesn't trip.
-					}
-
-					dragChangeY += dragDifY;//add to y any differences. even if goes up or down no big deal
-					if (dragChangeY > dragDeadZoneOpposite){//if dragging up
-						currentPlayer.setDirection('u');//we goin' up
-						dragChangeX = 0;
-					}
-					else if(dragChangeY < (dragDeadZoneOpposite*-1)){//if dragging down
-						currentPlayer.setDirection('d');//we goin' down
-						dragChangeX = 0;
-					}
-				}
-			}//END GOING RIGHT*/
 				if (currentPlayer.getDirection() == 'r') {//GOING RIGHT
 					if (Math.abs(dragDifY) >= Math.abs(dragDifX)) {//if y is bigger
 						if (Math.abs(dragDifX) > dragDeadZoneOpposite) {//if y is greater than dead zone
@@ -823,7 +822,120 @@ public class PlayScreen implements Screen, InputProcessor{
 			}//END IF IN MOVING BOUNDS
 
 		}
-		
+*/
+
+	/**
+	 * Literally just made this for the touch dragged method.
+	 * @param point1
+	 * @param point2
+     * @return returnst the Math.abs of the distance between the two points.
+     */
+	public float distForm(Vector2 point1, Vector2 point2){
+		return Math.abs(distForm(point1.x, point1.y, point2.x, point2.y));
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if(screenX < Gdx.graphics.getWidth()/2 ) {
+			currentPlayer.setIfMoving(true);
+			if (dragCoordsLastFrame.x == -1) {//if it's the first check of this drag
+				dragCoordsLastFrame.x = dragCoordsThisFrame.x;
+				dragCoordsLastFrame.y = dragCoordsThisFrame.y;
+				dragCoordsThisFrame.x = screenX;
+				dragCoordsThisFrame.y = screenY;//set this frame's
+				hudStage.getViewport().unproject(dragCoordsThisFrame);
+			} else {
+				dragCoordsLastFrame.x = dragCoordsThisFrame.x;
+				dragCoordsLastFrame.y = dragCoordsThisFrame.y;
+				dragCoordsThisFrame.x = screenX;
+				dragCoordsThisFrame.y = screenY;//set this frame's
+				hudStage.getViewport().unproject(dragCoordsThisFrame);
+				dragDifX = dragCoordsThisFrame.x - stopCoords.x;//difference of x drags.
+				dragDifY = dragCoordsThisFrame.y - stopCoords.y;//difference of y drags.
+			}
+			if(distForm(dragCoordsThisFrame, stopCoords) > 30) {//if out of dead zone
+				pixsPerSecond = distForm(dragCoordsThisFrame, dragCoordsLastFrame) / Gdx.graphics.getDeltaTime();
+				if (pixsPerSecond < stoppingSpeed) {//if the last pixs per second this frame < stopping
+					if (stopTimer.update(Gdx.graphics.getDeltaTime())) {
+						//if the timer is maxed out. Stopped within the time.
+						stopCoords.x = dragCoordsThisFrame.x;
+						stopCoords.y = dragCoordsThisFrame.y;
+						anchorDirection = currentPlayer.getDirection();
+
+					}//end if timer maxed
+				}//end if drag small enough
+				else {//bigger than stopping speed
+					movePoint = dragCoordsThisFrame;
+					stopTimer.reset();
+					moveSlope = dragDifY / dragDifX;
+
+					if(anchorDirection == 'd'){
+						temp = (float)Math.toDegrees(Math.asin((1/distForm(stopCoords, dragCoordsThisFrame) *
+								distForm(stopCoords.x, dragCoordsThisFrame.y, dragCoordsThisFrame.x, dragCoordsThisFrame.y))));
+						//gets the angle
+
+						if(temp <= 22.5){
+							//then it's to the left. Angle is yeah
+							if(dragDifY >= 0)
+							currentPlayer.direction = 'u';
+						}
+						else{
+							//left or right
+							if(dragCoordsThisFrame.x - stopCoords.x < 0) currentPlayer.setDirection('l');
+							else currentPlayer.setDirection('r');
+						}
+					}
+					else if(anchorDirection == 'u'){
+						temp = (float)Math.toDegrees(Math.asin((1/distForm(stopCoords, dragCoordsThisFrame) *
+								distForm(stopCoords.x, dragCoordsThisFrame.y, dragCoordsThisFrame.x, dragCoordsThisFrame.y))));
+						//gets the angle
+						if(temp<= 22.5 ){
+							if(dragDifY <= 0)
+							currentPlayer.setDirection('d');
+						}
+						else{
+							//left or right
+							if(dragCoordsThisFrame.x - stopCoords.x < 0) currentPlayer.setDirection('l');
+							else currentPlayer.setDirection('r');
+						}
+					}
+					else if(anchorDirection == 'r' || anchorDirection == 'l'){
+						temp = (float)Math.toDegrees(Math.asin((1/distForm(stopCoords, dragCoordsThisFrame) *
+								distForm(dragCoordsThisFrame.x, stopCoords.y, dragCoordsThisFrame.x, dragCoordsThisFrame.y))));
+						//gets the angle
+						if(temp <= 22.5) {
+							if (dragDifX >= 0)currentPlayer.setDirection('r');
+							else if (dragDifX < 0)currentPlayer.setDirection('l');
+						}
+						else{
+							if(dragDifY > 0)currentPlayer.setDirection('u');
+							else if(dragDifY <= 0)currentPlayer.setDirection('d');
+						}
+					}
+					System.out.println(currentPlayer.direction + ", " + temp);
+					/*
+					if (dragDifX <= 0) {//if dragging left
+
+						if (moveSlope > 0.5) currentPlayer.setDirection('d');
+							//going down
+						else if (moveSlope < 0.5 && moveSlope > -0.5)
+							currentPlayer.setDirection('l');
+							//going left
+						else if (moveSlope < -0.5) currentPlayer.setDirection('u');
+						//going right
+					}//end if dragging left
+					else {//dragging right
+						if (moveSlope > 0.5) currentPlayer.setDirection('u');//up
+						if (moveSlope < 0.5 && moveSlope > -0.5)
+							currentPlayer.setDirection('r');//right
+						else if (moveSlope < -0.5) currentPlayer.setDirection('d');//down
+					}
+					*///TEMP
+				}
+			}
+
+		}//END IF ON RIGHT SIDE OF SCREEN
+
 		return false;
 	}
 
