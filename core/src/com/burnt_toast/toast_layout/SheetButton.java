@@ -150,7 +150,7 @@ public class SheetButton extends Sheet{
 	 */
 	public boolean checkClick(float mouseX, float mouseY){
 		if(buttonRect.contains(mouseX,  mouseY)){
-			clickAction.accept(null, null);
+			//clickAction.accept(null, null);
 			return true;
 		}
 		return false;

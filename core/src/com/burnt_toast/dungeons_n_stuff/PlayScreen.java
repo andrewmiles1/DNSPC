@@ -7,6 +7,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -21,6 +22,7 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.burnt_toast.dungeons_n_stuff.MonsterPlaceholder.MonsType;
 import com.burnt_toast.dungeons_n_stuff.monsters.Slime;
 import com.burnt_toast.monster_generator.Pool;
+import com.dungeons_n_stuff.dungeon_layout.DungeonButton;
 
 public class PlayScreen implements Screen, InputProcessor{
 
@@ -45,7 +47,9 @@ public class PlayScreen implements Screen, InputProcessor{
 	private TextureRegion healthBar;
 	private TextureRegion hpTag;
 	private TextureRegion healthBorder;
-	private TextureRegion currentWeapon;//never initialized! on purpose
+	private DungeonButton miniMapBut;
+	private DungeonButton pauseBut;
+	private TextureRegion pixelForPause;//shown on screen when paused.
 	
 	private float widthWithZoom;
 	private float heightWithZoom;
@@ -93,6 +97,8 @@ public class PlayScreen implements Screen, InputProcessor{
 
 	private String tempStr;
 	
+	private boolean firstTimeShown;//to know if the screen has been shown before.
+	
 	
 	public PlayScreen(MainFrame passedMain){
 		main = passedMain;
@@ -102,11 +108,11 @@ public class PlayScreen implements Screen, InputProcessor{
 		mazeMap = main.mapLoader.load("maps/rogueMap.tmx");
 		otmr = new OrthogonalTiledMapRenderer(mazeMap);
 		pause = false;
-		
-		miniMap = new MiniMap(new TextureRegion(main.mainTileset, 65, 34, 1, 1), //seen
-				new TextureRegion(main.mainTileset, 65, 32, 1, 1),//unseen
-				new TextureRegion(main.mainTileset, 64, 34, 1, 1),//you are here
-				new TextureRegion(main.mainTileset, 0, 0, 1, 1),
+		pixelForPause = new TextureRegion(MainFrame.mainTileset, 65, 34, 1, 1);
+		miniMap = new MiniMap(new TextureRegion(MainFrame.mainTileset, 65, 34, 1, 1), //seen
+				new TextureRegion(MainFrame.mainTileset, 65, 32, 1, 1),//unseen
+				new TextureRegion(MainFrame.mainTileset, 64, 34, 1, 1),//you are here
+				new TextureRegion(MainFrame.mainTileset, 0, 0, 1, 1),
 				hudStage.getWidth()/2, hudStage.getHeight()/2);
 		collisionMap = new int[50][50];
 		
@@ -129,7 +135,19 @@ public class PlayScreen implements Screen, InputProcessor{
 				mazeMap.getTileSets().getTileSet(0));
 		
 		//HUD
-
+		pauseBut = new DungeonButton("Pause", main);
+		pauseBut.setWindowSize(hudStage.getWidth()/5, 20);
+		pauseBut.setWindowCoords(hudStage.getWidth()/5 * 4, hudStage.getViewport().getWorldHeight()-
+				pauseBut.getHeight());
+		pauseBut.setBorderScale(2);
+		pauseBut.setTextColor(Color.WHITE);
+		pauseBut.setTextSize(1.5f);
+		miniMapBut = new DungeonButton("Map", main);
+		miniMapBut.setWindowSize(hudStage.getWidth()/5, 20);
+		miniMapBut.setWindowCoords(0, hudStage.getViewport().getWorldHeight() - miniMapBut.getHeight());
+		miniMapBut.setBorderScale(1.5f);
+		miniMapBut.setTextColor(Color.WHITE);
+		
 		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 43, 4);
 		hpTag = new TextureRegion(MainFrame.mainTileset, 44, 53, 9, 4);
 		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 45, 6);
@@ -164,19 +182,27 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		gameOver = false;
-		floorLevel = 1;
-		activePlaceholders.clear();
-		activeSlimes.clear();
+		if(main.fadeCodename.equals("next level")){
+			floorLevel++;
+			loadMap();
+			main.fadeIn=true;
+		}
 		
-		//currentPlayer.setHealth(curren);
-		otmr.setMap(mazeMap);
-		main.fadeIn = true;
-		main.fadeOut = false;
-		orthoCam.update();
-		main.addInputProcessor(this);
-		loadMap();
-		miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
+		if(main.fadeCodename.equals("Start")){
+			gameOver = false;
+			floorLevel = 1;
+			activePlaceholders.clear();
+			activeSlimes.clear();
+			
+			//currentPlayer.setHealth(curren);
+			otmr.setMap(mazeMap);
+			main.fadeIn = true;
+			main.fadeOut = false;
+			orthoCam.update();
+			main.addInputProcessor(this);
+			loadMap();
+			miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
+		}
 
 		
 	}
@@ -192,23 +218,17 @@ public class PlayScreen implements Screen, InputProcessor{
 			tempStr = main.updateFade();
 
 			if (tempStr.equals("next level")) {
-
+				main.setScreen(main.menuScreen);
 			}
 			else if(tempStr.equals("game over")){
-
+				main.setScreen(main.menuScreen);
 			}
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
 		}
-		if(main.fadeTracker == 0 && main.fadeCodename.equals("next level")){
-				floorLevel++;
-				loadMap();
-				main.fadeIn=true;
-		}
-		if(main.fadeTracker == 0 && main.fadeCodename.equals("reset")){
-			main.setScreen(main.menuScreen);
-			main.fadeIn = true;
-		}
+
+		
+		
 		//ERIC
 		otmr.setView(orthoCam);
 		playStage.act();
@@ -247,12 +267,12 @@ public class PlayScreen implements Screen, InputProcessor{
 
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
 		main.gameFont.draw(playStage.getBatch(), "VER 0.L 7/5/2017", 0, 0);
-
 		playStage.getBatch().end();
 		
 		
 		
 		hudStage.getBatch().begin();
+		
 		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2, hudStage.getHeight()-35,
 				healthBorder.getRegionWidth() * 2, healthBorder.getRegionHeight() * 2);
 		hudStage.getBatch().draw(healthBar, hudStage.getWidth()/2+2,  hudStage.getHeight()-35+2,
@@ -260,9 +280,23 @@ public class PlayScreen implements Screen, InputProcessor{
 		hudStage.getBatch().draw(hpTag, hudStage.getWidth()/2+(healthBorder.getRegionWidth()-hpTag.getRegionWidth()),
 				hudStage.getHeight()-35+2,
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
-		miniMap.draw((SpriteBatch)hudStage.getBatch());
-		hudStage.getBatch().draw(main.buttonFrames[0], stopCoords.x, stopCoords.y);
+
+		hudStage.getBatch().draw(MainFrame.buttonFrames[0], stopCoords.x, stopCoords.y);
 		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
+		if(pause){
+			hudStage.getBatch().setColor(0.2f, 0.2f, 0.2f, 0.7f);
+			hudStage.getBatch().draw(pixelForPause, 0, 0, hudStage.getViewport().getWorldWidth(),
+					hudStage.getViewport().getWorldHeight());
+			hudStage.getBatch().setColor(1, 1, 1, 1);
+			if(!miniMap.getIfOnScreen())//only say paused if map isn't on screen
+			main.gameFont.draw(hudStage.getBatch(), "PAUSED", hudStage.getViewport().getWorldWidth()/2 - 6, 
+					hudStage.getViewport().getWorldHeight()/2 - 3);
+		}
+		miniMap.draw((SpriteBatch)hudStage.getBatch());
+		if((pause && miniMap.getIfOnScreen()) || (!pause && !miniMap.getIfOnScreen())){
+			miniMapBut.draw((SpriteBatch)hudStage.getBatch(), main.gameFont);
+		}
+		if(!miniMap.getIfOnScreen()) pauseBut.draw((SpriteBatch)hudStage.getBatch(), main.gameFont);
 		hudStage.getBatch().end();
 		
 		if(currentPlayer.health <= 0){
@@ -302,7 +336,7 @@ public class PlayScreen implements Screen, InputProcessor{
 					//remove the placholder from the linked list here
 					activePlaceholders.get(i).toggleInUse();
 					if(activePlaceholders.get(i).getMonsType() == MonsterPlaceholder.MonsType.SLIME){
-						this.activeSlimes.add(slimePool.getObject());
+						PlayScreen.activeSlimes.add(slimePool.getObject());
 						if(activeSlimes.getLast() == null){//if there were none in the pool
 							//System.out.println("Yeah");
 							activeSlimes.removeLast();
@@ -473,22 +507,18 @@ public class PlayScreen implements Screen, InputProcessor{
 		case 'a':
 			//archer
 			currentPlayer = new Archer();
-			currentWeapon = main.arrowStages[0];
 			break;
 		case 'w':
 			//wizard
 			currentPlayer = new Wizard();
-			currentWeapon = main.ringStages[0];
 			break;
 		case 'r':
 			//warrior
 			currentPlayer = new Warrior();
-			currentWeapon = main.swordStages[0];
 			break;
 		default:
 			//archer
 			currentPlayer = new Archer();
-			currentWeapon = main.arrowStages[0];
 		}
 	}
 
@@ -538,14 +568,14 @@ public class PlayScreen implements Screen, InputProcessor{
 	public <G extends Character> void hashCharacter(Character passChar){
 		//bottom right corner
 		temp = hash(passChar.getX(), passChar.getY()); //get hash key
-		if(!this.characterHash.containsKey(temp)){//if list doesn't exist
+		if(!PlayScreen.characterHash.containsKey(temp)){//if list doesn't exist
 			characterHash.put(temp, new LinkedList<Character>());//make it
 		}
 		characterHash.get(temp).add(passChar);//add character to hash
 		//top right corner next
 		temp = hash(passChar.getX() + passChar.getRectangle().width,
 				passChar.getY() + passChar.getRectangle().width);
-		if(!this.characterHash.containsKey(temp)){
+		if(!PlayScreen.characterHash.containsKey(temp)){
 			characterHash.put(temp, new LinkedList<Character>());
 		}
 		characterHash.get(temp).add(passChar);
@@ -674,10 +704,25 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
 		// TODO Auto-generated method stub
+	
+		touchCoordsTemp.x = screenX;
+		touchCoordsTemp.y = screenY;
+		hudStage.getViewport().unproject(touchCoordsTemp);
+		if(miniMapBut.checkClick(touchCoordsTemp.x, touchCoordsTemp.y)){
+			miniMap.setIfOnScreen(miniMap.getIfOnScreen()? false:true);
+			pause = pause?false:true;
+			return true;
+		}
+		if(pauseBut.checkClick(touchCoordsTemp.x, touchCoordsTemp.y) && !miniMap.getIfOnScreen()){
+			pause = pause?false:true;//toggle pause
+			return true;
+		}
+		if(pause)return false;
 		touchCoordsTemp.x = screenX;
 		touchCoordsTemp.y = screenY;
 		playStage.getViewport().unproject(touchCoordsTemp);
 		if(screenX < Gdx.graphics.getWidth() / 2){
+
 			//if its on the left side,
 			currentPlayer.setIfMoving(true);//start moving
 			touchDragged(screenX, screenY, pointer);
@@ -687,6 +732,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 		else if(screenX > Gdx.graphics.getWidth() / 2){
 			//if on the right side
+			
 			currentPlayer.attack();
 			return true;
 		}
@@ -698,6 +744,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
 		// TODO Auto-generated method stub
+		if(pause)return false;
 		touchCoordsTemp.x = screenX;
 		touchCoordsTemp.y = screenY;
 		playStage.getViewport().unproject(touchCoordsTemp);
@@ -706,6 +753,7 @@ public class PlayScreen implements Screen, InputProcessor{
 			currentPlayer.setIfMoving(false);//stop moving, 
 			dragCoordsThisFrame.x = -1;
 			dragCoordsThisFrame.y = -1;
+			return true;
 		}
 		return false;
 	}
@@ -836,6 +884,7 @@ public class PlayScreen implements Screen, InputProcessor{
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		if(pause)return false;
 		if(screenX < Gdx.graphics.getWidth()/2 ) {
 			currentPlayer.setIfMoving(true);
 			if (dragCoordsLastFrame.x == -1) {//if it's the first check of this drag

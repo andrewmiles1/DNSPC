@@ -64,7 +64,7 @@ public class MainFrame extends Game {
 	public static final float SCREEN_WIDTH = 12 * 30;//480
 	public static final float SCREEN_HEIGHT = 6 * 30;
 	
-	public static final String VERSION = "0.L";
+	public static final String VERSION = "0.1";
 	
 	public static final float TILE_SIZE = 8;//8 * 2
 	
