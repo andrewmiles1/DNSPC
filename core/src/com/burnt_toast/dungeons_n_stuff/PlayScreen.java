@@ -182,13 +182,13 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		if(main.fadeCodename.equals("next level")){
-			floorLevel++;
-			loadMap();
-			main.fadeIn=true;
-		}
+//		if(main.fadeCodename.equals("next level")){
+//			floorLevel++;
+//			loadMap();
+//			main.fadeIn=true;
+//		}
 		
-		if(main.fadeCodename.equals("Start")){
+		//if(main.fadeCodename.equals("Start")){
 			gameOver = false;
 			floorLevel = 1;
 			activePlaceholders.clear();
@@ -196,13 +196,14 @@ public class PlayScreen implements Screen, InputProcessor{
 			
 			//currentPlayer.setHealth(curren);
 			otmr.setMap(mazeMap);
-			main.fadeIn = true;
-			main.fadeOut = false;
+			//main.fadeIn = true;
+			//main.fadeOut = false;
 			orthoCam.update();
 			main.addInputProcessor(this);
 			loadMap();
 			miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
-		}
+			main.fadeOut = false;
+		//}
 
 		
 	}
@@ -213,19 +214,17 @@ public class PlayScreen implements Screen, InputProcessor{
 		Gdx.gl.glClearColor(0, 0, 0, 1);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
-		if(main.fadeIn || main.fadeOut){
 			//if fading
 			tempStr = main.updateFade();
-
+			main.fade(playStage.getBatch());
+			main.fade(otmr.getBatch());
 			if (tempStr.equals("next level")) {
 				main.setScreen(main.menuScreen);
 			}
 			else if(tempStr.equals("game over")){
 				main.setScreen(main.menuScreen);
 			}
-			main.fade(playStage.getBatch());
-			main.fade(otmr.getBatch());
-		}
+
 
 		
 		
@@ -367,9 +366,9 @@ public class PlayScreen implements Screen, InputProcessor{
 			}
 			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
 				pause = true;
-				main.fadeOut = true;
-				main.fadeIn = false;
-				main.fadeCodename = "next level";
+				//main.fadeOut = true;
+				//main.fadeIn = false;
+				main.setFadeCode("next level");
 				score += 100;
 			}
 		}//end if not pause
@@ -627,8 +626,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 		if(keycode == Keys.ENTER){
 			if(gameOver){
-				main.fadeOut = true;
-				main.fadeIn = false;
+				//main.fadeOut = true;
+				//main.fadeIn = false;
 				return true;
 			}
 		}

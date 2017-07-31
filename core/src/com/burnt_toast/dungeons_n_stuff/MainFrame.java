@@ -59,7 +59,7 @@ public class MainFrame extends Game {
 	public float fadeTracker;//to track the fade function
 	public float fadeFactor = 2;
 	public boolean fadeIn, fadeOut;
-	public String fadeCodename;//since I can't use lambda's I have to return a codename of who called me
+	private String fadeCodename;//since I can't use lambda's I have to return a codename of who called me
 	
 	public static final float SCREEN_WIDTH = 12 * 30;//480
 	public static final float SCREEN_HEIGHT = 6 * 30;
@@ -94,10 +94,11 @@ public class MainFrame extends Game {
 		assets.dispose();
 		batch.dispose();
 	}
-	public void setFadeCode(Consumer<Object> passCode){
-		fadeOutCode = passCode;
+	public void setFadeCode(String code){
+		fadeCodename = code;
 	}
 	public String updateFade(){
+		if(!fadeIn && !fadeOut)return "false";
 		if(fadeIn){//fading in
 			if(fadeTracker < 1){
 				fadeTracker += (fadeFactor * Gdx.graphics.getDeltaTime());
@@ -125,18 +126,27 @@ public class MainFrame extends Game {
 		return "null";//returns if neither fadeIn or fadeOut were true;
 	}
 	public <T> void fade(T t){
-		if(t.getClass() == Music.class){
-			//
-			((Music)t).setVolume(fadeTracker);
-			System.out.println(fadeTracker);
+		if(!fadeIn && !fadeOut)return;
+		if(t != null){
+			if(t.getClass() == Music.class){
+				//
+				((Music)t).setVolume(fadeTracker);
+				System.out.println(fadeTracker);
+			}
+			if(t.getClass() == SpriteBatch.class){
+				((SpriteBatch)t).setColor(fadeTracker, fadeTracker, fadeTracker, 1);
+			}
+			if(t.getClass() == BitmapFont.class){
+				((BitmapFont)t).setColor(((BitmapFont)t).getColor().r, ((BitmapFont)t).getColor().g,
+						((BitmapFont)t).getColor().b, fadeTracker);
+			}
 		}
-		if(t.getClass() == SpriteBatch.class){
-			((SpriteBatch)t).setColor(fadeTracker, fadeTracker, fadeTracker, 1);
-		}
-		if(t.getClass() == BitmapFont.class){
-			((BitmapFont)t).setColor(((BitmapFont)t).getColor().r, ((BitmapFont)t).getColor().g,
-					((BitmapFont)t).getColor().b, fadeTracker);
-		}
+	}
+	public void fadeIn(){
+		fadeIn = true;
+	}
+	public void fadeOut(){
+		fadeOut = true;
 	}
 	public float getHeightOf(String str){
 		glyphLayout.setText(gameFont, str);

@@ -73,8 +73,9 @@ public class SplashScreen implements Screen{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		main.fadeIn = true;
-		main.fadeOut = false;
+		//main.fadeIn = true;
+		//main.fadeOut = false;
+		main.fadeIn();
 		//about to show screen set to fade in
 		main.gameFont.getData().scale(0.5f);
 	}
@@ -89,11 +90,12 @@ public class SplashScreen implements Screen{
 		
 		
 		//REDRAW
-		if(main.fadeIn || main.fadeOut){
-			main.updateFade();
+			
+			if(main.updateFade() == "toMenu"){
+				main.setScreen(main.menuScreen);
+			}
 			main.fade(splashStage.getBatch());
 			main.fade(main.gameFont);
-		}
 		
 		splashStage.act();
 		splashStage.draw();
@@ -121,7 +123,9 @@ public class SplashScreen implements Screen{
 		else{
 			if(main.assets.getQueuedAssets() == 0 && loadIndex == -1){
 				//we're done!
-				main.fadeOut = true;
+				//main.fadeOut = true;
+				main.setFadeCode("toMenu");
+				main.fadeOut();
 				if(main.fadeTracker == 0)main.setScreen(main.menuScreen);
 			}
 		}

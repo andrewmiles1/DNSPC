@@ -160,16 +160,23 @@ public class MenuScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		main.fadeIn = true;
-		main.fadeOut = false;
+		/*
 		if(main.fadeCodename.equals("next level")){
+			if(PlayScreen.floorLevel %2 != 0){
+				main.setScreen(main.playScreen);
+				
+				return;
+			}
 			currentLayout = upgradeMenu;
 		}
-		else if(main.fadeCodename.equals("game over")){
+		else //if(main.fadeCodename.equals("game over")){
+		{
 			currentLayout = mainMenu;
 		}
-	
+		*/
 		//move camera to place not viewport mmk
+		main.fadeIn();
+		
 		menuStage.getCamera().update();
 		widthWithZoom = menuStage.getWidth() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
 		heightWithZoom = menuStage.getHeight() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
@@ -213,13 +220,11 @@ public class MenuScreen implements Screen, InputProcessor{
 		
 		//REDRAW
 		//batch fade
-		if(main.fadeIn || main.fadeOut){
 			fadeCode(main.updateFade());
 			main.fade(menuStage.getBatch());
 			main.fade(main.gameFont);
 			main.fade(main.otmr.getBatch());
 			
-		}
 		menuStage.act();
 		menuStage.draw();
 		main.otmr.setView(orthoCam);	
@@ -306,18 +311,20 @@ public class MenuScreen implements Screen, InputProcessor{
 
 			if(buttonName == "Play"){
 				
-				main.fadeOut = true;
-				main.fadeCodename = "play";
+				//main.fadeOut = true;
+				main.setFadeCode("play");
+				//main.fadeOut();
 			}
 		}
 		if(currentLayout == characterPick){
 
 			if(buttonName == "Start"){//start with character
 				main.playScreen.setCharacter('r');
-				main.fadeOut = true;
+				//main.fadeOut = true;
 				System.out.println("fade code is start");
 				
-				main.fadeCodename = "Start";
+				main.setFadeCode("Start");
+				//main.fadeOut();
 
 			}
 		}
@@ -328,7 +335,7 @@ public class MenuScreen implements Screen, InputProcessor{
 
 			if(fadeCodename == "play"){
 				currentLayout = characterPick;
-				main.fadeIn = true;
+				//main.fadeIn = true;
 			}
 
 		}
@@ -337,8 +344,8 @@ public class MenuScreen implements Screen, InputProcessor{
 				//play with character
 				
 				main.setScreen(main.playScreen);
-				main.fadeIn = true;
-				main.fadeOut = false;
+				//main.fadeIn = true;
+				//main.fadeOut = false;
 			}
 		}
 	}
