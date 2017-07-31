@@ -148,6 +148,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		miniMapBut.setBorderScale(1.5f);
 		miniMapBut.setTextColor(Color.WHITE);
 		
+		
+		
 		healthBar = new TextureRegion(MainFrame.mainTileset, 44, 49, 43, 4);
 		hpTag = new TextureRegion(MainFrame.mainTileset, 44, 53, 9, 4);
 		healthBorder = new TextureRegion(MainFrame.mainTileset, 43, 41, 45, 6);
@@ -175,6 +177,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		stopTimer = new Timer(0.0001f);
 		stopCoords = new Vector2();
 		movePoint = new Vector2();
+		
+		floorLevel = 0;
 	}
 	
 	
@@ -182,19 +186,17 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-//		if(main.fadeCodename.equals("next level")){
-//			floorLevel++;
-//			loadMap();
-//			main.fadeIn=true;
-//		}
+		if(floorLevel != 0){
+			loadMap();
+			//main.fadeIn = true;
+		}
 		
-		//if(main.fadeCodename.equals("Start")){
+		if(floorLevel == 0){
 			gameOver = false;
-			floorLevel = 1;
 			activePlaceholders.clear();
 			activeSlimes.clear();
 			
-			//currentPlayer.setHealth(curren);
+			currentPlayer.setHealth(currentPlayer.getHealth());
 			otmr.setMap(mazeMap);
 			//main.fadeIn = true;
 			//main.fadeOut = false;
@@ -202,8 +204,9 @@ public class PlayScreen implements Screen, InputProcessor{
 			main.addInputProcessor(this);
 			loadMap();
 			miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
-			main.fadeOut = false;
-		//}
+			
+			
+		}
 
 		
 	}
@@ -219,7 +222,12 @@ public class PlayScreen implements Screen, InputProcessor{
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
 			if (tempStr.equals("next level")) {
+				if(floorLevel % 2 == 0){
 				main.setScreen(main.menuScreen);
+				}
+				else{
+					loadMap();
+				}
 			}
 			else if(tempStr.equals("game over")){
 				main.setScreen(main.menuScreen);
@@ -282,7 +290,7 @@ public class PlayScreen implements Screen, InputProcessor{
 
 		hudStage.getBatch().draw(MainFrame.buttonFrames[0], stopCoords.x, stopCoords.y);
 		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
-		if(pause){
+		if(pause && !currentPlayer.getRectangle().overlaps(endDoorRect)){
 			hudStage.getBatch().setColor(0.2f, 0.2f, 0.2f, 0.7f);
 			hudStage.getBatch().draw(pixelForPause, 0, 0, hudStage.getViewport().getWorldWidth(),
 					hudStage.getViewport().getWorldHeight());
@@ -301,6 +309,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(currentPlayer.health <= 0){
 			gameOver = true;
 			pause = true;
+			floorLevel = 0;
 		}
 		
 		
@@ -366,6 +375,7 @@ public class PlayScreen implements Screen, InputProcessor{
 			}
 			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
 				pause = true;
+				main.fadeOut();
 				//main.fadeOut = true;
 				//main.fadeIn = false;
 				main.setFadeCode("next level");
@@ -396,13 +406,12 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void pause() {
 		// TODO Auto-generated method stub
-		
+		pause = true;
 	}
 
 	@Override
 	public void resume() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
@@ -449,8 +458,10 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(gameOver){
 			gameOver = false;
 			pause = false;
-			floorLevel = 1;
 		}
+		floorLevel++;
+		main.fadeIn();
+		
 		//I decided to change it to plus
 		collisionMap = mapTool.prepareMap(4 + (2*(PlayScreen.floorLevel-1)));
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
@@ -469,6 +480,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		pause = false;
 		this.doorButtonPressed = false;
 		if(floorLevel >=6) currentPlayer.maxHealth = 100;
+		//main.fadeIn();
+		
 	}//end load map
 	public void buttonCode(String buttonName){
 		

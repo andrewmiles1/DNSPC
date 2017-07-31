@@ -121,11 +121,13 @@ public class SplashScreen implements Screen{
 			loadTimer+= Gdx.graphics.getDeltaTime();
 		}
 		else{
-			if(main.assets.getQueuedAssets() == 0 && loadIndex == -1){
+			if(main.assets.getQueuedAssets() == 0 && loadIndex < 0){
 				//we're done!
 				//main.fadeOut = true;
 				main.setFadeCode("toMenu");
-				main.fadeOut();
+				if(loadIndex == -1){
+				main.fadeOut(); loadIndex = -2;
+				}
 				if(main.fadeTracker == 0)main.setScreen(main.menuScreen);
 			}
 		}

@@ -180,15 +180,24 @@ public class MenuScreen implements Screen, InputProcessor{
 		menuStage.getCamera().update();
 		widthWithZoom = menuStage.getWidth() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
 		heightWithZoom = menuStage.getHeight() * ((OrthographicCamera)(menuStage.getCamera())).zoom;
-		System.out.println(widthWithZoom);
+		if(main.playScreen.floorLevel == 0){
+			this.currentLayout = this.characterPick;
+			//got here from start
+			System.out.println(widthWithZoom);
+			menuStage.getViewport().apply();
+			main.addInputProcessor(this);
+			selectedClass = "warrior";//no classes have been selected yet. //update: default selected class is warrior
+			
+			System.out.println(((OrthographicCamera)(menuStage.getCamera())).zoom);
+			
+		}
+		else{
+			currentLayout = this.upgradeMenu;
+		}
+
 		menuStage.getViewport().apply();
-		main.addInputProcessor(this);
-		selectedClass = "warrior";//no classes have been selected yet. //update: default selected class is warrior
-		
-		System.out.println(((OrthographicCamera)(menuStage.getCamera())).zoom);
 		
 		
-		menuStage.getViewport().apply();
 		orthoCam.update();
 	}
 
@@ -313,7 +322,7 @@ public class MenuScreen implements Screen, InputProcessor{
 				
 				//main.fadeOut = true;
 				main.setFadeCode("play");
-				//main.fadeOut();
+				main.fadeOut();
 			}
 		}
 		if(currentLayout == characterPick){
@@ -324,7 +333,7 @@ public class MenuScreen implements Screen, InputProcessor{
 				System.out.println("fade code is start");
 				
 				main.setFadeCode("Start");
-				//main.fadeOut();
+				main.fadeOut();
 
 			}
 		}
@@ -335,7 +344,7 @@ public class MenuScreen implements Screen, InputProcessor{
 
 			if(fadeCodename == "play"){
 				currentLayout = characterPick;
-				//main.fadeIn = true;
+				main.fadeIn();
 			}
 
 		}
@@ -344,7 +353,7 @@ public class MenuScreen implements Screen, InputProcessor{
 				//play with character
 				
 				main.setScreen(main.playScreen);
-				//main.fadeIn = true;
+				main.fadeIn();
 				//main.fadeOut = false;
 			}
 		}

@@ -146,6 +146,10 @@ public class MainFrame extends Game {
 		fadeIn = true;
 	}
 	public void fadeOut(){
+		System.out.println("That thing was hit");
+		if(this.getScreen() == playScreen){
+			assert false;
+		}
 		fadeOut = true;
 	}
 	public float getHeightOf(String str){
