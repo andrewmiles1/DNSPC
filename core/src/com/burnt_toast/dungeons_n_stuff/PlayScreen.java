@@ -90,6 +90,8 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	private static Player currentPlayer;
 	
+	private int endButIndexX;//the block where it's randomed x and y
+	private int endButIndexY;
 	private Rectangle endDoorRect;
 	private Rectangle buttonRect;
 	private AnimatedObject endDoor;
@@ -186,27 +188,45 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void show() {
 		// TODO Auto-generated method stub
-		if(floorLevel != 0){
-			loadMap();
-			//main.fadeIn = true;
-		}
+		main.addInputProcessor(this);
+//		if(floorLevel != 0){
+//
+//			//main.fadeIn = true;
+//			activePlaceholders.clear();
+//			activeSlimes.clear();
+//			
+//			loadMap();
+//			currentPlayer.setHealth(currentPlayer.getHealth());
+//		}
+		
+		currentPlayer.setMaxHealth();
+		currentPlayer.setDamage();
+		currentPlayer.setMovementSpeed();
+		System.out.println(currentPlayer);
 		
 		if(floorLevel == 0){
 			gameOver = false;
+			main.menuScreen.setAttackRadMod(1);
+			main.menuScreen.setHealthMod(1);
+			main.menuScreen.setSpeedMod(1);
+			main.menuScreen.setDamageMod(1);//reset upgrade stuff.
+			
+		}
 			activePlaceholders.clear();
 			activeSlimes.clear();
-			
+			loadMap();
 			currentPlayer.setHealth(currentPlayer.getHealth());
 			otmr.setMap(mazeMap);
 			//main.fadeIn = true;
 			//main.fadeOut = false;
 			orthoCam.update();
-			main.addInputProcessor(this);
-			loadMap();
+
 			miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
 			
 			
-		}
+			
+			
+
 
 		
 	}
@@ -226,6 +246,7 @@ public class PlayScreen implements Screen, InputProcessor{
 				main.setScreen(main.menuScreen);
 				}
 				else{
+					main.setFadeCode("nah ya'll");
 					loadMap();
 				}
 			}
@@ -287,7 +308,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		hudStage.getBatch().draw(hpTag, hudStage.getWidth()/2+(healthBorder.getRegionWidth()-hpTag.getRegionWidth()),
 				hudStage.getHeight()-35+2,
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
-
+//
 		hudStage.getBatch().draw(MainFrame.buttonFrames[0], stopCoords.x, stopCoords.y);
 		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
 		if(pause && !currentPlayer.getRectangle().overlaps(endDoorRect)){
@@ -309,13 +330,13 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(currentPlayer.health <= 0){
 			gameOver = true;
 			pause = true;
-			floorLevel = 0;
+			//floorLevel = 0;
 		}
 		
 		
 		
 		//INPUT
-		if(!pause){
+		if(!pause && !main.fadeIn && !main.fadeOut){
 			//CALCULATE
 			//clear hash
 			this.clearHash();
@@ -374,11 +395,13 @@ public class PlayScreen implements Screen, InputProcessor{
 				}
 			}
 			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
+				//finished the level WOOP now: 
 				pause = true;
 				main.fadeOut();
-				//main.fadeOut = true;
-				//main.fadeIn = false;
 				main.setFadeCode("next level");
+				if(floorLevel % 2 == 0){
+				main.menuScreen.addUpgPoint();
+				}
 				score += 100;
 			}
 		}//end if not pause
@@ -470,8 +493,25 @@ public class PlayScreen implements Screen, InputProcessor{
 		endDoor.setY((collisionMap.length-3)*8);
 		endDoorRect.setX((collisionMap.length - 5) * 8);
 		endDoorRect.setY((collisionMap.length-3) * 8 - endDoorRect.getHeight());
-		buttonRect.x = (collisionMap.length-4)*8;
-		buttonRect.y = (collisionMap.length-4)*8;
+		if(floorLevel < 3){//if first two levels, then button is next to door
+			buttonRect.x = (collisionMap.length-4)*8;
+			buttonRect.y = (collisionMap.length-4)*8;
+		}
+		else{
+			//if the floor level is greater than 2.
+			for(int i = 0; i < 100; i++){
+				endButIndexX = (int)(Math.random() * collisionMap.length);
+				endButIndexY = (int)(Math.random() * collisionMap.length);
+				if(collisionMap[endButIndexX][endButIndexY] == 0)break;
+				//if we finally found one, we're out. One that's open.
+				if(i == 99){
+					buttonRect.x = 1 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
+					buttonRect.y = 3 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
+				}
+			}
+		}
+		
+
 		
 		currentPlayer.setPosition(3 * MainFrame.TILE_SIZE, 3 * MainFrame.TILE_SIZE);
 		currentPlayer.setDirection('u');//up at default.
@@ -551,7 +591,9 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 	public void generateHealthAt(float x, float y){
-		if(Math.random() >= (0.5/*currentPlayer.getHealth()/currentPlayer.maxHealth*/)){
+		//if floor level is over 15 then as long as it's bigger than 0.5,
+		//because at floor 15 it has to be bigger than .95
+		if(Math.random() >= (floorLevel>15?0.9 : (0.6 + (0.07 * (floorLevel/3))))){
 			activePlaceholders.add(placeholderPool.getObject());
 			if(activePlaceholders.getLast() == null){
 				activePlaceholders.removeLast();
@@ -564,7 +606,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 	}
 	public void generateMonsterAt(float x, float y){
-		if(Math.random() >= (0.9 - 0.1 * 2/*was originially the floor level. TEMP*/)){
+		if(Math.random() >= (0.9 - 0.1 * floorLevel)){
 		activePlaceholders.add(placeholderPool.getObject());//
 		if(activePlaceholders.getLast() == null){
 			activePlaceholders.removeLast();
@@ -595,6 +637,9 @@ public class PlayScreen implements Screen, InputProcessor{
 	
 	public void hashPlaceholder(MonsterPlaceholder passMonst){
 		
+	}
+	public static Player getCurrentPlayer(){
+		return currentPlayer;
 	}
 	
 	public static boolean checkCharacterCollision(float x, float y, Rectangle rect){
@@ -627,6 +672,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public boolean keyDown(int keycode) {
 		// TODO Auto-generated method stub
+		if(main.fadeIn || main.fadeOut)return false;
 		if(keycode == Keys.SPACE){
 //			if(gameOver){
 //				main.setScreen(main.menuScreen);
@@ -635,6 +681,7 @@ public class PlayScreen implements Screen, InputProcessor{
 //				return true;
 //			}
 			currentPlayer.attack();
+			System.out.println("One n Done");
 			return true;
 		}
 		if(keycode == Keys.ENTER){
@@ -670,6 +717,13 @@ public class PlayScreen implements Screen, InputProcessor{
 			}
 			else
 				pause = true;
+		}
+		else if(keycode == Keys.G){
+			doorButtonPressed = true;
+			currentPlayer.setPosition(endDoorRect.getX(), endDoorRect.getY());
+		}
+		else if(keycode == Keys.UP){
+			main.menuScreen.addUpgPoint();
 		}
 		else if(keycode == Keys.M){
 			miniMap.toggleIfOnScreen();

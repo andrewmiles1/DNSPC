@@ -9,8 +9,6 @@ public class Warrior extends Player{
 	public Warrior() {
 		super(MainFrame.warriorFrames);
 		this.attackMaxTime = 0.25f;
-		this.meeleeDamage[0] = 1;
-		this.meeleeDamage[1] = 2;
 		// TODO Auto-generated constructor stub
 	}
 

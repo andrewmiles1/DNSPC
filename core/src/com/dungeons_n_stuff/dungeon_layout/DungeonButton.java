@@ -1,5 +1,6 @@
 package com.dungeons_n_stuff.dungeon_layout;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.burnt_toast.dungeons_n_stuff.MainFrame;
@@ -14,6 +15,9 @@ public class DungeonButton extends SheetButton{
 		this.setRefHoriz(4,  1);
 		this.setRefVert(1, 4);
 		this.setRefMiddle(6, 6);
+		this.setBorderScale(2);
+		this.setTextColor(Color.WHITE);
+		this.setTextSize(2);
 		// TODO Auto-generated constructor stub
 	}
 	

@@ -93,7 +93,7 @@ public class MazeGenerator {
 				randomX = (int) (availableCells.size() * Math.random());//get random for both x and y
 				System.out.println(availableCells.size());
 				if(randomX == availableCells.size()){
-					System.out.println("LAKSJFDLJ");
+					//System.out.println("LAKSJFDLJ");
 				}
 				while(availableCells.get(randomX).isEmpty()){
 					randomX++;//iterate trhough until not empty

@@ -18,6 +18,9 @@ public abstract class Monster extends Character{
 	protected float giveUpTimer; //the amount of time this goes back to being a placeholder
 	protected float hitPause;
 	protected float hitPauseTimer;
+	
+	protected float hurtMax;
+	protected float hurtTimer;//tracks
 	@SuppressWarnings("rawtypes")
 	protected Pool parentPool;
 	//these next 3 are for moving more smoothly. actually these next 5.
@@ -34,6 +37,7 @@ public abstract class Monster extends Character{
 		this.isMoving = true;
 		this.parentPool = parentPool;
 		hitPause = 1.0f;
+		hurtMax = 0.25f;
 		this.setDirection('n');//n for nunya business
 		// TODO Auto-generated constructor stub
 	}
@@ -42,8 +46,8 @@ public abstract class Monster extends Character{
 	@Override
 	public void draw(SpriteBatch batch) {
 		// TODO Auto-generated method stub
-		if(hitPauseTimer > 0){
-			//batch.setColor(150, 150, 150, 100);
+		if(hurtTimer > 0){
+			batch.setColor(1, 1, 1, 0.5f);
 		}
 		if(flipped == true){
 			batch.draw(this.frames[this.animationIndex], this.getX(), this.getY(),
@@ -65,7 +69,9 @@ public abstract class Monster extends Character{
 		giveUpTimer = passPatience;
 	}
 	public boolean update(Player currentPlayer){
-		
+		if(hurtTimer > 0){
+			hurtTimer -= Gdx.graphics.getDeltaTime();
+		}
 		if(this.health <=0){
 			//retire object
 			this.toggleInUse();
@@ -74,6 +80,7 @@ public abstract class Monster extends Character{
 		update();
 		if(hitPauseTimer > 0){
 			//color change when I'mhit
+			
 		}
 		if(PlayScreen.distForm(currentPlayer.getX()+currentPlayer.getRectangle().getWidth()/2,
 				currentPlayer.getY()+currentPlayer.getRectangle().getHeight()/2,
@@ -95,6 +102,7 @@ public abstract class Monster extends Character{
 			giveUpTimer = patienceTime;
 			return true;
 		}
+
 
 		return false;
 	}
@@ -141,6 +149,7 @@ public abstract class Monster extends Character{
 	public void hit(float damage){
 		super.hit(damage);
 		this.hitPauseTimer = hitPause;
+		this.hurtTimer = this.hurtMax;
 	}
 	
 	

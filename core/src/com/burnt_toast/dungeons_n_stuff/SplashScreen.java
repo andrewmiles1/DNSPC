@@ -102,10 +102,10 @@ public class SplashScreen implements Screen{
 		
 		splashStage.getBatch().begin();
 		splashStage.getBatch().draw(toastImg, splashStage.getWidth()/2 - (toastImg.getRegionWidth()*imgScale/2),
-				(splashStage.getHeight()/2 - (toastImg.getRegionHeight()*imgScale / 2) + 100),
+				(splashStage.getHeight()/2 - (toastImg.getRegionHeight()*imgScale / 2) /*+100*/),
 				toastImg.getRegionWidth() * imgScale, (toastImg.getRegionHeight() * imgScale));
 		main.gameFont.draw(splashStage.getBatch(), "Burnt_Toast", (splashStage.getWidth()/2) - (main.getWidthOf("Burnt_Toast") / 2), 
-				(splashStage.getHeight()/2) - (main.getHeightOf("Burnt_Toast") / 2));
+				(splashStage.getHeight()/2) - (main.getHeightOf("Burnt_Toast") / 2) - toastImg.getRegionHeight()*imgScale/2);
 	
 		if(loadTimer >= loadTimerMax && main.assets.getQueuedAssets() != 0 && loadIndex < loadCode.size()){//if it's taking too long tell them it's loading.
 			main.gameFont.draw(splashStage.getBatch(), "Loading...", splashStage.getWidth() / 2 - main.getWidthOf("Loading..")/2,

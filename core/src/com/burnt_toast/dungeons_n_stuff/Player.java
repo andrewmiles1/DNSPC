@@ -36,37 +36,45 @@ public class Player extends Character {
 	public void attack() {
 		if (PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y) != null) {
 			for (Character tempChar : PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y)) {
-				if (tempChar.getRectangle().overlaps(this.meleeRect))
+				if (tempChar.getRectangle().overlaps(this.meleeRect)){
 					tempChar.hit(
-							(int) (Math.random() * ((this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0]))
+							(int) (Math.random() * (this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0])
 									+ 1);
+					return;
+				}
 			}
 		}
 		if (PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y + meleeRect.width) != null) {
 			for (Character tempChar : PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width,
 					meleeRect.y + meleeRect.width)) {
-				if (tempChar.getRectangle().overlaps(this.meleeRect))
+				if (tempChar.getRectangle().overlaps(this.meleeRect)){
 					tempChar.hit(
-							(int) (Math.random() * ((this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0]))
+							(int) (Math.random() * (this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0])
 									+ 1);
+					return;
+				}
 			}
 		}
 		if (PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width, meleeRect.y) != null) {
 			for (Character tempChar : PlayScreen.getCharactersAt(meleeRect.x + meleeRect.width,
 					meleeRect.y)) {
-				if (tempChar.getRectangle().overlaps(this.meleeRect))
+				if (tempChar.getRectangle().overlaps(this.meleeRect)){
 					tempChar.hit(
-							(int) (Math.random() * ((this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0]))
+							(int) (Math.random() * (this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0])
 									+ 1);
+					return;
+				}
 			}
 		}
 		if (PlayScreen.getCharactersAt(meleeRect.x, meleeRect.y + meleeRect.width) != null) {
 			for (Character tempChar : PlayScreen.getCharactersAt(meleeRect.x,
 					meleeRect.y + meleeRect.width)) {
-				if (tempChar.getRectangle().overlaps(this.meleeRect))
+				if (tempChar.getRectangle().overlaps(this.meleeRect)){
 					tempChar.hit(
-							(int) (Math.random() * ((this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0]))
+							(int) (Math.random() * (this.meeleeDamage[1] - meeleeDamage[0] + 1) + meeleeDamage[0])
 									+ 1);
+					return;
+				}
 			}
 		}
 
@@ -109,15 +117,20 @@ public class Player extends Character {
 		if(isMoving)
 		move();
 	}
-
-	public float getMovementSpeed() {
-		return this.movementSpeed;
+	
+	public void setDamage(){
+		this.meeleeDamage[1] = (int) (10 + (MenuScreen.getDamageMod() * 2));
+		this.meeleeDamage[0] = (int) (meeleeDamage[1] - 5);
 	}
 
-	public float calcHealth() {
-		return 15;
+	public void setMovementSpeed() {
+		this.movementSpeed =  32 + (MenuScreen.getSpeedMod()-1) * 3;//3 is just a guesstimate
 	}
 
+
+	public void setMaxHealth() {
+		this.maxHealth = 50 + (MenuScreen.getHealthMod() * 15);//just a guesstimate
+	}
 	public float getMaxHealth() {
 		return this.maxHealth;
 	}
@@ -159,6 +172,11 @@ public class Player extends Character {
 			meleeRect.y = collisionRect.y - (Math.abs(collisionRect.getHeight() - meleeRect.getHeight()) / 2);
 			break;
 		}
+	}
+	
+	public String toString(){
+		return "Player toString: "
+				+ "\n Damage: " + meeleeDamage[1] + "~Speed: " + this.movementSpeed + "~MaxHealth: " + this.maxHealth;
 	}
 
 }
