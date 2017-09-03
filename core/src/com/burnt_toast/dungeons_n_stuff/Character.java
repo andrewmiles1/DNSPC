@@ -22,6 +22,7 @@ public abstract class Character extends Poolable{
 	protected char direction;//facing direction
 	protected boolean flipped;//used when flipping the character.
 	protected float movementSpeed;
+
 	protected float frameSizeX;
 	protected float frameSizeY;
 	protected float meleeSizeX;

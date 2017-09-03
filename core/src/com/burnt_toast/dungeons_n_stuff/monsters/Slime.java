@@ -5,10 +5,11 @@ import com.burnt_toast.dungeons_n_stuff.MainFrame;
 import com.burnt_toast.dungeons_n_stuff.Monster;
 import com.burnt_toast.dungeons_n_stuff.PlayScreen;
 import com.burnt_toast.monster_generator.Pool;
+import com.burnt_toast.monster_generator.Poolable;
 
 public class Slime extends Monster{
 
-	public Slime(Pool<Slime> parentPool) {
+	public Slime(Pool parentPool) {
 		super(MainFrame.slimeFrames, parentPool);
 		movementSpeed = 5;
 		health = 2;

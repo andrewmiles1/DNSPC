@@ -95,6 +95,17 @@ public class MiniMap {
 		this.midOfScreenY = passMidOfScreenY;
 	}
 	public void activateBlock(int x, int y, PlayScreen play){
+		activateBlock(x, y, play, true);
+	}
+
+	/**
+	 * Activate block at
+	 * @param x of position of activate
+	 * @param y of poistion of activate
+	 * @param play just the play screen
+	 * @param spawnMonst if it should spawn monsters on activate or not
+	 */
+	public void activateBlock(int x, int y, PlayScreen play, boolean spawnMonst){
 		if(playerXnY.x == x && playerXnY.y == y){
 			return;
 		}
@@ -104,7 +115,7 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x][y+1+i] == 0){
 					visibilityMap[x][y+1+i] = 9;//set visible
-					play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
+					if(spawnMonst)play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
 							(y+1+i) * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x][y+1+i] == 1){//if I reached a wall
@@ -116,7 +127,7 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x][y-1-i] == 0){
 					visibilityMap[x][y-1-i] = 9;//set visible
-					play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
+					if(spawnMonst)play.generateMonsterAt(x * MainFrame.TILE_SIZE * 3,
 							(y-1-i) * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x][y-1-i] == 1){
@@ -128,7 +139,7 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x+1+i][y] == 0){
 					visibilityMap[x+1+i][y] = 9;//set visible
-					play.generateMonsterAt((x + 1 + i) * MainFrame.TILE_SIZE * 3,
+					if(spawnMonst)play.generateMonsterAt((x + 1 + i) * MainFrame.TILE_SIZE * 3,
 							y * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x+1+i][y] == 1){
@@ -140,7 +151,7 @@ public class MiniMap {
 			for(int i = 0; i < blockSightDistance; i++){
 				if(textMap[x-1-i][y] == 0){
 					visibilityMap[x-1-i][y] = 9;//set visible
-					play.generateMonsterAt((x-1-i) * MainFrame.TILE_SIZE * 3,
+					if(spawnMonst)play.generateMonsterAt((x-1-i) * MainFrame.TILE_SIZE * 3,
 							y * MainFrame.TILE_SIZE * 3);
 				}
 				else if(textMap[x-1-i][y] == 1){
@@ -176,7 +187,7 @@ public class MiniMap {
 						batch.draw(this.darkPixel,
 								MainFrame.TILE_SIZE * i * 3 - 4,
 								MainFrame.TILE_SIZE * k * 3 + MainFrame.TILE_SIZE*3,
-								MainFrame.TILE_SIZE * 3 + 8, MainFrame.TILE_SIZE+4);
+								MainFrame.TILE_SIZE * 3 + 4, MainFrame.TILE_SIZE+4);
 					}//end if up is wall
 					if(visibilityMap[i+1][k] == 1){//if right is wall
 						batch.draw(this.darkPixel,

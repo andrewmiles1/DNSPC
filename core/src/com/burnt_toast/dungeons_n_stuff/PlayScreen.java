@@ -57,6 +57,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	//MONSTER STUFF
 	private static LinkedList<Slime> activeSlimes;
 	private Pool<Slime> slimePool;
+	private Pool<Arrow> arrowPool;
 	private LinkedList<MonsterPlaceholder> activePlaceholders;
 	private Pool<MonsterPlaceholder> placeholderPool;
 	private MonsterPlaceholder testPlaceholder;
@@ -93,9 +94,13 @@ public class PlayScreen implements Screen, InputProcessor{
 	private int endButIndexX;//the block where it's randomed x and y
 	private int endButIndexY;
 	private Rectangle endDoorRect;
-	private Rectangle buttonRect;
+	//private Rectangle buttonRect;
 	private AnimatedObject endDoor;
-	private boolean doorButtonPressed;
+	//private boolean doorButtonPressed;
+	private boolean doorIsOpen;
+	private boolean keyFound;
+	private Rectangle keyRect;
+	private TextureRegion key;
 
 	private String tempStr;
 	
@@ -162,7 +167,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		activePlaceholders = new LinkedList<MonsterPlaceholder>();
 		placeholderPool = new Pool<MonsterPlaceholder>();
 		activeSlimes = new LinkedList<Slime>();
-		slimePool = new Pool<Slime>();
+		slimePool = new Pool<Slime>("slime");
+		arrowPool = new Pool<Arrow>("arrow");
 		tempRect = new Rectangle();
 		
 		characterHash = new HashMap<Float, LinkedList<Character>>();
@@ -170,7 +176,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		orthoCam.zoom -= 0.5;
 		
-		buttonRect = new Rectangle(0, 0, 8, 8);
+		key = MainFrame.key;
+		keyRect = new Rectangle(0, 0, key.getRegionWidth(), key.getRegionHeight());
 		endDoorRect = new Rectangle(0, 0, 6, 2);
 		endDoor = new AnimatedObject(MainFrame.doorFrames, 0.05f, false, 0, 0);
 		floorLevel = 1;
@@ -198,7 +205,7 @@ public class PlayScreen implements Screen, InputProcessor{
 //			loadMap();
 //			currentPlayer.setHealth(currentPlayer.getHealth());
 //		}
-		
+		pauseBut.setButtonText("Pause");
 		currentPlayer.setMaxHealth();
 		currentPlayer.setDamage();
 		currentPlayer.setMovementSpeed();
@@ -210,12 +217,13 @@ public class PlayScreen implements Screen, InputProcessor{
 			main.menuScreen.setHealthMod(1);
 			main.menuScreen.setSpeedMod(1);
 			main.menuScreen.setDamageMod(1);//reset upgrade stuff.
+			mapTool.clearMap();
 			
 		}
 			activePlaceholders.clear();
 			activeSlimes.clear();
 			loadMap();
-			currentPlayer.setHealth(currentPlayer.getHealth());
+			currentPlayer.setHealth(currentPlayer.getMaxHealth());
 			otmr.setMap(mazeMap);
 			//main.fadeIn = true;
 			//main.fadeOut = false;
@@ -234,13 +242,18 @@ public class PlayScreen implements Screen, InputProcessor{
 	@Override
 	public void render(float delta) {
 		// TODO Auto-generated method stub
-		Gdx.gl.glClearColor(0, 0, 0, 1);
+		Gdx.gl.glClearColor(
+				55f * (1f/255f) * main.fadeTracker,
+				65f * (1f/255f) * main.fadeTracker,
+				113f * (1f/255f) * main.fadeTracker, 1
+		);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		
 			//if fading
 			tempStr = main.updateFade();
 			main.fade(playStage.getBatch());
 			main.fade(otmr.getBatch());
+			main.fade(main.gameFont);
 			if (tempStr.equals("next level")) {
 				if(floorLevel % 2 == 0){
 				main.setScreen(main.menuScreen);
@@ -251,6 +264,9 @@ public class PlayScreen implements Screen, InputProcessor{
 				}
 			}
 			else if(tempStr.equals("game over")){
+				if(main.adHandler != null){
+					main.adHandler.showAds();
+				}
 				main.setScreen(main.menuScreen);
 			}
 
@@ -264,28 +280,27 @@ public class PlayScreen implements Screen, InputProcessor{
 		hudStage.act();
 		hudStage.draw();
 		
-		otmr.render();
+		//otmr.render();
 		otmr.getBatch().begin();
-		otmr.renderTileLayer((TiledMapTileLayer)mazeMap.getLayers().get(0));
+		//otmr.renderTileLayer((TiledMapTileLayer)mazeMap.getLayers().get(0));
 		otmr.getBatch().end();
 		
 
 		
 		playStage.getBatch().begin();
+		mapTool.drawMap((SpriteBatch)playStage.getBatch());
 		//stuff drawn in order of placement in front of stuff
-		if(this.doorButtonPressed){
+		if(endDoor.isActive() || endDoor.isEnded()){
 			endDoor.draw((SpriteBatch)playStage.getBatch());
-			playStage.getBatch().draw(MainFrame.buttonFrames[1],
-					buttonRect.getX(), buttonRect.getY());
 		}
-		else{
-			playStage.getBatch().draw(MainFrame.buttonFrames[0], buttonRect.getX(), buttonRect.getY());
+		//if the key aint found then don't draw it
+		if(!keyFound){
+			playStage.getBatch().draw(key, keyRect.x, keyRect.y);
 		}
 		for(Slime sl: activeSlimes){
 			sl.draw((SpriteBatch)playStage.getBatch());
 		}
 		currentPlayer.draw((SpriteBatch)playStage.getBatch());
-		//draw the test slime
 		
 
 		for(MonsterPlaceholder m: activePlaceholders){
@@ -294,30 +309,36 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 
 		miniMap.drawVisibilityOnMap((SpriteBatch)playStage.getBatch());
-		main.gameFont.draw(playStage.getBatch(), "VER 0.L 7/5/2017", 0, 0);
+		//main.gameFont.draw(playStage.getBatch(), "VER 1.0 7/5/2017", 0, 0);
 		playStage.getBatch().end();
 		
 		
 		
 		hudStage.getBatch().begin();
+		//FIXME put the key inside a better box on screen.
+		//placement is minus width * 3 just so it looks better and not right next to the button.
+		if(keyFound)hudStage.getBatch().draw(key, pauseBut.getX() - key.getRegionWidth() * 3, pauseBut.getY(), key.getRegionWidth() * 2, key.getRegionHeight() * 2);//draws at top right corner. Not pretty, fix later.
+		//TEMP CODE ABOVE
 		
-		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2, hudStage.getHeight()-35,
+		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2- healthBorder.getRegionWidth(), hudStage.getHeight()-35,
 				healthBorder.getRegionWidth() * 2, healthBorder.getRegionHeight() * 2);
-		hudStage.getBatch().draw(healthBar, hudStage.getWidth()/2+2,  hudStage.getHeight()-35+2,
+		hudStage.getBatch().draw(healthBar, hudStage.getWidth()/2 - healthBar.getRegionWidth(),  hudStage.getHeight()-35+2,
 				(currentPlayer.getHealth()/currentPlayer.getMaxHealth())*43 * 2, healthBar.getRegionHeight() * 2);
-		hudStage.getBatch().draw(hpTag, hudStage.getWidth()/2+(healthBorder.getRegionWidth()-hpTag.getRegionWidth()),
+		hudStage.getBatch().draw(hpTag, hudStage.getWidth()/2- hpTag.getRegionWidth(),
 				hudStage.getHeight()-35+2,
 				hpTag.getRegionWidth() * 2, hpTag.getRegionHeight() * 2);
 //
-		hudStage.getBatch().draw(MainFrame.buttonFrames[0], stopCoords.x, stopCoords.y);
+		//this next line is if any time I want the input to be showing on screen.
+		//hudStage.getBatch().draw(MainFrame.buttonFrames[0], stopCoords.x, stopCoords.y);
 		main.gameFont.draw(hudStage.getBatch(), "Floor Level: " + floorLevel + "\t Score: " + score, 0, 20);
 		if(pause && !currentPlayer.getRectangle().overlaps(endDoorRect)){
 			hudStage.getBatch().setColor(0.2f, 0.2f, 0.2f, 0.7f);
 			hudStage.getBatch().draw(pixelForPause, 0, 0, hudStage.getViewport().getWorldWidth(),
 					hudStage.getViewport().getWorldHeight());
 			hudStage.getBatch().setColor(1, 1, 1, 1);
-			if(!miniMap.getIfOnScreen())//only say paused if map isn't on screen
-			main.gameFont.draw(hudStage.getBatch(), "PAUSED", hudStage.getViewport().getWorldWidth()/2 - 6, 
+			if(!miniMap.getIfOnScreen())//only say paused if map isn't on screen && not game over
+			main.gameFont.draw(hudStage.getBatch(), (gameOver? "GAME OVER \nscore: " + score + "\n Version: " + MainFrame.VERSION: "PAUSED")
+					, hudStage.getViewport().getWorldWidth()/2 - 6,
 					hudStage.getViewport().getWorldHeight()/2 - 3);
 		}
 		miniMap.draw((SpriteBatch)hudStage.getBatch());
@@ -327,7 +348,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(!miniMap.getIfOnScreen()) pauseBut.draw((SpriteBatch)hudStage.getBatch(), main.gameFont);
 		hudStage.getBatch().end();
 		
-		if(currentPlayer.health <= 0){
+		if(currentPlayer.getHealth() <= 0){
+			pauseBut.setButtonText("Reset");
 			gameOver = true;
 			pause = true;
 			//floorLevel = 0;
@@ -367,6 +389,7 @@ public class PlayScreen implements Screen, InputProcessor{
 					if(activePlaceholders.get(i).getMonsType() == MonsterPlaceholder.MonsType.SLIME){
 						PlayScreen.activeSlimes.add(slimePool.getObject());
 						if(activeSlimes.getLast() == null){//if there were none in the pool
+							System.out.println("RETURNED NULL FROM POOL");
 							//System.out.println("Yeah");
 							activeSlimes.removeLast();
 							activeSlimes.add(new Slime(slimePool));
@@ -388,21 +411,29 @@ public class PlayScreen implements Screen, InputProcessor{
 			endDoor.update();
 			currentPlayer.update();
 			
-			if(currentPlayer.getRectangle().overlaps(buttonRect)){
-				if(!this.doorButtonPressed){
-				this.doorButtonPressed = true;
-				endDoor.play();
+			if(currentPlayer.getRectangle().overlaps(keyRect)){
+				if(!keyFound){
+				this.keyFound = true;
+
 				}
 			}
-			if(doorButtonPressed && currentPlayer.getRectangle().overlaps(endDoorRect)){
-				//finished the level WOOP now: 
-				pause = true;
-				main.fadeOut();
-				main.setFadeCode("next level");
-				if(floorLevel % 2 == 0){
-				main.menuScreen.addUpgPoint();
+			if(distForm(currentPlayer.getX(), currentPlayer.getY(), endDoorRect.getX(), endDoorRect.getY()) < MainFrame.TILE_SIZE * 1.5
+					&& !doorIsOpen && !endDoor.isEnded() && keyFound){
+				endDoor.play();
+				doorIsOpen = true;
+			}
+			if(keyFound && currentPlayer.getRectangle().overlaps(endDoorRect)){
+				if(doorIsOpen) {//stepped in place and door is open.
+					//finished the level WOOP now:
+					currentPlayer.setIfMoving(false);
+					pause = true;
+					main.fadeOut();
+					main.setFadeCode("next level");
+					if (floorLevel % 2 == 0) {
+						main.menuScreen.addUpgPoint();
+					}
+					score += 100;
 				}
-				score += 100;
 			}
 		}//end if not pause
 
@@ -487,6 +518,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		
 		//I decided to change it to plus
 		collisionMap = mapTool.prepareMap(4 + (2*(PlayScreen.floorLevel-1)));
+
 		this.miniMap.setMapVerbose(mapTool.getSmallCollisionMap(), true);
 		
 		endDoor.setX((collisionMap.length-5)*8);
@@ -494,8 +526,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		endDoorRect.setX((collisionMap.length - 5) * 8);
 		endDoorRect.setY((collisionMap.length-3) * 8 - endDoorRect.getHeight());
 		if(floorLevel < 3){//if first two levels, then button is next to door
-			buttonRect.x = (collisionMap.length-4)*8;
-			buttonRect.y = (collisionMap.length-4)*8;
+			keyRect.x = (collisionMap.length-5)* MainFrame.TILE_SIZE;
+			keyRect.y = (collisionMap.length-6)* MainFrame.TILE_SIZE;
 		}
 		else{
 			//if the floor level is greater than 2.
@@ -505,8 +537,8 @@ public class PlayScreen implements Screen, InputProcessor{
 				if(collisionMap[endButIndexX][endButIndexY] == 0)break;
 				//if we finally found one, we're out. One that's open.
 				if(i == 99){
-					buttonRect.x = 1 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
-					buttonRect.y = 3 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
+					keyRect.x = 1 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
+					keyRect.y = 3 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
 				}
 			}
 		}
@@ -516,9 +548,10 @@ public class PlayScreen implements Screen, InputProcessor{
 		currentPlayer.setPosition(3 * MainFrame.TILE_SIZE, 3 * MainFrame.TILE_SIZE);
 		currentPlayer.setDirection('u');//up at default.
 		System.out.println("ACTIVATED FIRST BLOCK");
-		miniMap.activateBlock(1, 1, this);
+		miniMap.activateBlock(1, 1, this, false);
 		pause = false;
-		this.doorButtonPressed = false;
+		doorIsOpen = false;
+		keyFound = false;
 		if(floorLevel >=6) currentPlayer.maxHealth = 100;
 		//main.fadeIn();
 		
@@ -719,14 +752,20 @@ public class PlayScreen implements Screen, InputProcessor{
 				pause = true;
 		}
 		else if(keycode == Keys.G){
-			doorButtonPressed = true;
+			doorIsOpen = true;
 			currentPlayer.setPosition(endDoorRect.getX(), endDoorRect.getY());
 		}
 		else if(keycode == Keys.UP){
 			main.menuScreen.addUpgPoint();
 		}
 		else if(keycode == Keys.M){
-			miniMap.toggleIfOnScreen();
+			//FIXME just temporary miniMap.toggleIfOnScreen();
+			for(int i = 0; i < collisionMap.length; i++){
+				for(int k = 0; k < collisionMap.length; k++){
+					System.out.print(collisionMap[i][k]);
+				}
+				System.out.println();
+			}
 			return true;
 		}
 		return false;
@@ -780,8 +819,17 @@ public class PlayScreen implements Screen, InputProcessor{
 			return true;
 		}
 		if(pauseBut.checkClick(touchCoordsTemp.x, touchCoordsTemp.y) && !miniMap.getIfOnScreen()){
-			pause = pause?false:true;//toggle pause
-			return true;
+			if(gameOver){
+				main.setFadeCode("game over");
+				main.fadeOut();
+				floorLevel = 0;
+				return true;
+			}
+			else {
+				pause = pause ? false : true;//toggle pause
+				return true;
+			}
+
 		}
 		if(pause)return false;
 		touchCoordsTemp.x = screenX;
@@ -790,8 +838,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		if(screenX < Gdx.graphics.getWidth() / 2){
 
 			//if its on the left side,
-			currentPlayer.setIfMoving(true);//start moving
-			touchDragged(screenX, screenY, pointer);
+			//currentPlayer.setIfMoving(true);//start moving
+//			touchDragged(screenX, screenY, pointer);
 			stopCoords.x = touchCoordsTemp.x;
 			stopCoords.y = touchCoordsTemp.y;
 			return true;
@@ -952,7 +1000,7 @@ public class PlayScreen implements Screen, InputProcessor{
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
 		if(pause)return false;
 		if(screenX < Gdx.graphics.getWidth()/2 ) {
-			currentPlayer.setIfMoving(true);
+
 			if (dragCoordsLastFrame.x == -1) {//if it's the first check of this drag
 				dragCoordsLastFrame.x = dragCoordsThisFrame.x;
 				dragCoordsLastFrame.y = dragCoordsThisFrame.y;
@@ -969,6 +1017,7 @@ public class PlayScreen implements Screen, InputProcessor{
 				dragDifY = dragCoordsThisFrame.y - stopCoords.y;//difference of y drags.
 			}
 			if(distForm(dragCoordsThisFrame, stopCoords) > 30) {//if out of dead zone
+				currentPlayer.setIfMoving(true);//start moving, as we change direction.
 				pixsPerSecond = distForm(dragCoordsThisFrame, dragCoordsLastFrame) / Gdx.graphics.getDeltaTime();
 				if (pixsPerSecond < stoppingSpeed) {//if the last pixs per second this frame < stopping
 					if (stopTimer.update(Gdx.graphics.getDeltaTime())) {

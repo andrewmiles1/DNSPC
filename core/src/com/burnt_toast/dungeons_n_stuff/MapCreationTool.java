@@ -1,18 +1,20 @@
 package com.burnt_toast.dungeons_n_stuff;
 
-import java.util.LinkedList;
-
-import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
-import com.badlogic.gdx.maps.tiled.TiledMapTileLayer.Cell;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
+import com.badlogic.gdx.math.Vector2;
 import com.burnt_toast.maze_generator.MazeGenerator;
+
+import java.util.LinkedList;
 
 public class MapCreationTool {
 
 	int[][] smallCollisionMap;
 	int[][] currentCollisionMap;
+	int[][] idMap;
+	LinkedList<Vector2> deadEndCoords;//the coords of the dead ends.
 	TiledMapTileLayer visualLayer;
 	TiledMapTile floor;
 	TiledMapTile wall;
@@ -35,6 +37,33 @@ public class MapCreationTool {
 	TiledMapTile botLeftCorner;
 	TiledMapTile botRightCorner;
 	TiledMapTile doorTile;
+
+	public static int FLOOR = 0;
+	public static int WALL = 1;
+	//2 - 3 - 4
+	//5 - - - 6
+	//7 - 8 - 9
+	public static int TOP_LEFT = 2;
+	public static int TOP_RIGHT = 4;
+	public static int TOP = 3;
+	public static int RIGHT = 6;
+	public static int LEFT = 5;
+	public static int BOTTOM = 8;
+	public static int BOTTOM_RIGHT = 9;
+	public static int BOTTOM_LEFT = 7;
+	//10 - 11 - 12
+	public static int BRICK_MIDDLE = 11;
+	public static int BRICK_RIGHT = 12;
+	public static int BRICK_LEFT = 10;
+	//13 - 14
+	//-  -  -
+	//15 - 16
+	public static int TOP_LEFT_CORNER = 13;
+	public static int TOP_RIGHT_CORNER = 14;
+	public static int BOT_LEFT_CORNER = 15;
+	public static int BOT_RIGHT_CORNER = 16;
+
+	public static int DOOR_TILE = 17;
 	
 	//used for making map look pretty
 	int idSum;
@@ -45,7 +74,7 @@ public class MapCreationTool {
 		
 		wall = tileSet.getTile(6);
 		mazeGen = new MazeGenerator();
-		
+
 		topLeftTile = tileSet.getTile(3);
 		topRightTile = tileSet.getTile(5);
 		topTile = tileSet.getTile(4);
@@ -57,6 +86,7 @@ public class MapCreationTool {
 		middleBrickTile = tileSet.getTile(22);
 		rightBrickTile = tileSet.getTile(54);
 		leftBrickTile = tileSet.getTile(38);
+
 		topLeftCorner = tileSet.getTile(1);
 		topRightCorner = tileSet.getTile(2);
 		botLeftCorner = tileSet.getTile(17);
@@ -70,6 +100,8 @@ public class MapCreationTool {
 	 * This function makes the thing look so good. 
 	 */
 	public void makeItLookPretty(){
+
+
 		/*
 		 * double for loop to loop through every single block
 		 * check 
@@ -123,58 +155,80 @@ public class MapCreationTool {
 				switch(idSum){
 				case 6:case 12:case 14://if left
 					visualLayer.getCell(i, k).setTile(leftTile);//sets left
+					idMap[i][k] = LEFT;
 					break;
 				case 0:
 					//don't set anything
 					break;
 				case 143: //if top right corner
 					visualLayer.getCell(i, k).setTile(topRightCorner);
+					idMap[i][k] = TOP_RIGHT_CORNER;
 					break;
 				case 227: //if top left
 					visualLayer.getCell(i, k).setTile(topLeftCorner);
+					idMap[i][k] = TOP_LEFT_CORNER;
 					break;
 				case 248: //if bottom left
 					visualLayer.getCell(i,k).setTile(leftBrickTile);
 					visualLayer.getCell(i, k+1).setTile(botLeftCorner);
+					idMap[i][k] = BRICK_LEFT;
+					idMap[i][k+1] = BOT_LEFT_CORNER;
 					break;
 				case 62://if bottom right
 					visualLayer.getCell(i, k).setTile(rightBrickTile);
 					visualLayer.getCell(i, k+1).setTile(botRightCorner);
+					idMap[i][k] = BRICK_RIGHT;
+					idMap[i][k+1] = BOT_RIGHT_CORNER;
 					break;
 				case 96:case 192:case 224://if right
 					visualLayer.getCell(i, k).setTile(rightTile);
+						idMap[i][k] = RIGHT;
 					break;
 				case 129:case 130:case 131:case 3://if down
 					visualLayer.getCell(i, k).setTile(bottomTile);
+						idMap[i][k] = BOTTOM;
 					break;
-				case 32://if top right
+				case 32://if right
 					visualLayer.getCell(i, k).setTile(rightTile);
+					idMap[i][k] = RIGHT;
 					break;
 				case 8://if top left
 					visualLayer.getCell(i, k).setTile(leftTile);
+					idMap[i][k] = LEFT;
 					break;
 				case 2://if bottom left
 					visualLayer.getCell(i, k).setTile(bottomLeftTile);
+					idMap[i][k] = BOTTOM_LEFT;
 					break;
 				case 128://if bottom right
 					visualLayer.getCell(i, k).setTile(bottomRightTile);
+					idMap[i][k] = BOTTOM_RIGHT;
 					break;
 				case 56://brick wall
 					visualLayer.getCell(i, k).setTile(middleBrickTile);
 					visualLayer.getCell(i, k+1).setTile(topTile);
+					idMap[i][k] = BRICK_MIDDLE;
+					idMap[i][k+1] = TOP;
 					break;
 				case 24://left brick wall
 					visualLayer.getCell(i, k).setTile(middleBrickTile);
 					visualLayer.getCell(i, k+1).setTile(topTile);
 					visualLayer.getCell(i-1, k+1).setTile(topLeftTile);
+					idMap[i][k] = BRICK_LEFT;
+					idMap[i][k+1] = TOP;
+					idMap[i-1][k+1] = TOP_LEFT;
 					break;
 				case 48://right brick wall
 					visualLayer.getCell(i, k).setTile(middleBrickTile);
 					visualLayer.getCell(i, k+1).setTile(topTile);
 					visualLayer.getCell(i+1, k+1).setTile(topRightTile);
+					idMap[i][k] = BRICK_RIGHT;
+					idMap[i][k+1] = TOP;
+					idMap[i+1][k+1] = TOP_RIGHT;
 					break;
 				case 4://left wall
 					visualLayer.getCell(i, k).setTile(leftTile);
+					idMap[i][k] = LEFT;
 					break;
 				default:
 						//don't set anything it's a floor
@@ -185,14 +239,36 @@ public class MapCreationTool {
 			System.out.println("");
 		}//end row for
 		visualLayer.getCell(currentCollisionMap.length-5, currentCollisionMap.length - 3).setTile(doorTile);
+		idMap[currentCollisionMap.length-5][ currentCollisionMap.length - 3] = DOOR_TILE;
+		//NOTES: DO NOT DELETE
 		//visualLayer.getCell(1, 1).setTile(this.middleBrickTile);
 		//visualLayer.getCell(1, 2).setTile(this.middleBrickTile); UP
 		//visualLayer.getCell(2, 1).setTile(this.middleBrickTile); RIGHT
+		//END NOTES
 	}
 	public int[][] getSmallCollisionMap(){
 		return smallCollisionMap;
 	}
-	
+	public void drawMap(SpriteBatch batch){
+		for(int i = 0; i < idMap.length; i++){
+			for(int k = 0; k < idMap.length; k++){
+				batch.draw(MainFrame.mapTiles[idMap[i][k]], i*MainFrame.TILE_SIZE, k * MainFrame.TILE_SIZE);
+			}
+		}
+	}
+
+	public void clearMap(){
+		//double for loop to clear map
+		for(int k = visualLayer.getWidth()-1; k > 0; k--) {
+			for (int i = 0; i < visualLayer.getHeight(); i++) {
+				if(visualLayer.getCell(k, i).getTile().getId() != wall.getId()){//if this tile is not a wall
+					visualLayer.getCell(k, i).setTile(wall);//sets them all to walls
+					idMap[k][i] = WALL;
+				}
+			}
+		}
+	}
+
 	/**
 	 * The only parameter is the SMALL version of the size. 
 	 * The small version is what the maze generator uses,
@@ -202,9 +278,20 @@ public class MapCreationTool {
 	 */
 	public int[][] prepareMap(int mapSizeSmall){
 
+
+
 		smallCollisionMap = mazeGen.generateMaze(mapSizeSmall, true);
 		currentCollisionMap = new int[(smallCollisionMap.length * sizeUpFactor)][(smallCollisionMap.length * sizeUpFactor)];
-		
+		idMap = new int[currentCollisionMap.length][currentCollisionMap.length];
+
+
+		//CALC DEAD ENDS HERE.
+
+
+
+		//copies the small collision maze to the larger one using the size up factor.
+		//needs the quadrouple loop to go to x,y of grouping of 3 by 3 and then 
+		//x, y inside the 3 by 3.
 		for(int i = 0; i < smallCollisionMap.length; i++){//Row Normal
 			for(int k = 0; k < sizeUpFactor; k++){//row doubled 
 				for(int l = 0; l < smallCollisionMap.length; l++){//column normal
@@ -214,18 +301,27 @@ public class MapCreationTool {
 				}
 			}
 		}
+		//displays maze from the 3 by 3 tiles
 		for(int i = 0; i < currentCollisionMap.length; i++){
 			for(int k = 0; k < currentCollisionMap.length; k++){
 				System.out.print(currentCollisionMap[i][k]);
 			}
 			System.out.println();
 		}
+		//also copying over but to the map that I'm not using any more
+		//FIXME Delete
 		for(int i = 0; i < currentCollisionMap.length;i++){
 			for(int k = 0; k < currentCollisionMap.length;k++){
 				if(currentCollisionMap[i][k] == 0)
 				visualLayer.getCell(i, k).setTile(floor);
 				else if(currentCollisionMap[i][k] == 1)
 				visualLayer.getCell(i, k).setTile(wall);
+			}
+		}
+		//copying the collision map over to the id map
+		for(int i = 0; i < currentCollisionMap.length; i++){
+			for(int k = 0; k < currentCollisionMap.length; k++){
+				idMap[i][k] = currentCollisionMap[i][k];
 			}
 		}
 		makeItLookPretty();

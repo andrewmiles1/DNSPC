@@ -1,7 +1,6 @@
 package com.burnt_toast.dungeons_n_stuff;
 
 import java.util.LinkedList;
-import java.util.function.Consumer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -30,8 +29,6 @@ public class SplashScreen implements Screen{
 	private float imgScale = 10;
 	
 	private int loadIndex;
-	private LinkedList<Consumer<Object>> loadCode;//the lines of code to run when loading
-	//pretty sure this one won't have much, but it's possible.
 	
 	private float loadTimerMax = 2.5f;//when this is reached, it shows loading on screen
 	private float loadTimer = 0;
@@ -107,7 +104,7 @@ public class SplashScreen implements Screen{
 		main.gameFont.draw(splashStage.getBatch(), "Burnt_Toast", (splashStage.getWidth()/2) - (main.getWidthOf("Burnt_Toast") / 2), 
 				(splashStage.getHeight()/2) - (main.getHeightOf("Burnt_Toast") / 2) - toastImg.getRegionHeight()*imgScale/2);
 	
-		if(loadTimer >= loadTimerMax && main.assets.getQueuedAssets() != 0 && loadIndex < loadCode.size()){//if it's taking too long tell them it's loading.
+		if(loadTimer >= loadTimerMax && main.assets.getQueuedAssets() != 0){//if it's taking too long tell them it's loading.
 			main.gameFont.draw(splashStage.getBatch(), "Loading...", splashStage.getWidth() / 2 - main.getWidthOf("Loading..")/2,
 					splashStage.getHeight()/2 - main.getHeightOf("Loading...")/2 - 100);
 			//main.assets.finishLoading();
@@ -159,18 +156,11 @@ public class SplashScreen implements Screen{
 			main.archerFrames[3] = new TextureRegion(main.characterTexture, 25, 12, 3, 5);//blue normal arrow
 			main.archerFrames[4] = new TextureRegion(main.characterTexture, 28, 12, 3, 5);//green poison arrow
 			
-			main.arrowStages = new TextureRegion[3];
-			main.arrowStages[0] = new TextureRegion(main.mainTileset, 0, 69, 10, 10);
-			main.arrowStages[1] = new TextureRegion(main.mainTileset, 10, 69, 10, 10);
-			main.arrowStages[2] = new TextureRegion(main.mainTileset, 20, 69, 10, 10);
+			main.arrow = new TextureRegion(main.mainTileset, 30, 49, 3, 5);
+			main.arrowBox = new TextureRegion(main.mainTileset, 0, 70, 9, 9);
 			main.swordStages = new TextureRegion[3];
-			main.arrowStages[0] = new TextureRegion(main.mainTileset, 0, 49, 10, 10);
 			main.swordStages[1] = new TextureRegion(main.mainTileset, 10, 49, 10, 10);
 			main.swordStages[2] = new TextureRegion(main.mainTileset, 20, 49, 10, 10);
-			main.ringStages = new TextureRegion[3];
-			main.ringStages[0] = new TextureRegion(main.mainTileset, 0, 59, 10, 10);
-			main.ringStages[1] = new TextureRegion(main.mainTileset, 10, 59, 10, 10);
-			main.ringStages[2] = new TextureRegion(main.mainTileset, 20, 59, 10, 10);
 			
 			//ALL DEM SLIME FRAMES
 			//main.slimeFrames[0] = new TextureRegion(main.characterTexture)
@@ -180,15 +170,41 @@ public class SplashScreen implements Screen{
 			main.wizardFrames[0] = new TextureRegion(main.characterTexture, 0, 20, 8, 9);//person
 			main.wizardFrames[1] = new TextureRegion(main.characterTexture, 8, 20, 8, 9);//person step & attack
 			main.wizardFrames[2] = new TextureRegion(main.characterTexture, 17, 20, 8, 8);//melee
+
+			//TILES:
+			main.mapTiles = new TextureRegion[18];
+			//wall
+			main.mapTiles[1] = new TextureRegion(main.mainTileset, 40, 0, 8, 8);
+			//floor
+			main.mapTiles[0] = new TextureRegion(main.mainTileset, 24, 8, 8, 8);//floor
+			//moar tiles.
+			main.mapTiles[2] = new TextureRegion(main.mainTileset, 16, 0, 8, 8);//top left
+			main.mapTiles[3] = new TextureRegion(main.mainTileset, 24, 0, 8, 8);//top
+			main.mapTiles[4] = new TextureRegion(main.mainTileset, 32, 0, 8, 8);//top right
+			main.mapTiles[5] = new TextureRegion(main.mainTileset, 16, 8, 8, 8);//left
+			main.mapTiles[6] = new TextureRegion(main.mainTileset, 32, 8, 8, 8);//right
+			main.mapTiles[7] = new TextureRegion(main.mainTileset, 16, 16, 8, 8);//bottom left
+			main.mapTiles[8] = new TextureRegion(main.mainTileset, 24, 16, 8, 8);//bottom
+			main.mapTiles[9] = new TextureRegion(main.mainTileset, 32, 16, 8, 8);//bottom right
+			main.mapTiles[10] = new TextureRegion(main.mainTileset, 40, 16, 8, 8);//left brick
+			main.mapTiles[11] = new TextureRegion(main.mainTileset, 40, 8, 8, 8);//middle brick
+			main.mapTiles[12] = new TextureRegion(main.mainTileset, 40, 24, 8, 8);//right brick
+			main.mapTiles[13] = new TextureRegion(main.mainTileset, 0, 0, 8, 8);//top left corner
+			main.mapTiles[14] = new TextureRegion(main.mainTileset, 8, 0, 8, 8);//top right corner
+			main.mapTiles[15] = new TextureRegion(main.mainTileset, 0, 8, 8, 8);//bottom left corner
+			main.mapTiles[16] = new TextureRegion(main.mainTileset, 8, 8, 8, 8);//bottom right corner
+			main.mapTiles[17] = new TextureRegion(main.mainTileset, 48, 0, 8, 8);//door tile
+
 			break;
 		case 1:
 			main.warriorFrames = new TextureRegion[5];
 			main.warriorFrames[0] = new TextureRegion(main.characterTexture, 0, 0, 8, 9);//person 
 			main.warriorFrames[1] = new TextureRegion(main.characterTexture, 8, 0, 9, 9);//person step and attack
 			main.warriorFrames[2] = new TextureRegion(main.mainTileset, 26, 40, 5, 9);//meelee.
-			main.slimeFrames = new TextureRegion[4];
+			main.slimeFrames = new TextureRegion[3];
 			main.slimeFrames[0] = new TextureRegion(main.characterTexture, 0, 30, 8, 4);
 			main.slimeFrames[1] = new TextureRegion(main.characterTexture, 8, 29, 8, 5);
+			main.slimeFrames[2] = new TextureRegion(main.mainTileset, 33, 40, 5, 7);//melee thing.
 			break;
 		case 0:
 			MainFrame.doorFrames = new TextureRegion[4];
@@ -199,6 +215,8 @@ public class SplashScreen implements Screen{
 			main.buttonFrames = new TextureRegion[2];
 			main.buttonFrames[0] = new TextureRegion(MainFrame.mainTileset, 96, 16, 8, 8);
 			main.buttonFrames[1] = new TextureRegion(MainFrame.mainTileset, 96, 24, 8, 8);
+			main.key = new TextureRegion(main.mainTileset, 0, 40, 3, 6);
+
 			main.silverFrame = new TextureRegion(main.mainTileset, 112, 24, 8, 8);
 			Gdx.input.setInputProcessor(main.getInputMultiplexer());
 			main.menuScreen = new MenuScreen(main);

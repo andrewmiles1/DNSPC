@@ -184,7 +184,8 @@ public class MenuScreen implements Screen, InputProcessor{
 		//PLAY button to play with selected character
 		playWithCharacter = new DungeonButton("Start", passedMain);
 		playWithCharacter.setWindowSize(80, 40);
-		playWithCharacter.setWindowCoords(widthWithZoom - playWithCharacter.getWidth(), 0);
+		//position was at bottom right but I wanted it in the middle instead.
+		playWithCharacter.setWindowCoords(widthWithZoom/2 - playWithCharacter.getWidth()/2, 0);
 		playWithCharacter.setBorderScale(2);
 		playWithCharacter.setTextColor(Color.WHITE);
 		playWithCharacter.setTextSize(2);
@@ -304,6 +305,7 @@ public class MenuScreen implements Screen, InputProcessor{
 			main.fade(menuStage.getBatch());
 			main.fade(main.gameFont);
 			main.fade(main.otmr.getBatch());
+			main.fade(main.gameFont);
 			
 		menuStage.act();
 		menuStage.draw();
@@ -332,12 +334,14 @@ public class MenuScreen implements Screen, InputProcessor{
 			main.gameFont.draw(menuStage.getBatch(), "Drag on the \nleft side \nto move,", 5, heightWithZoom/10 * 8);
 			main.gameFont.draw(menuStage.getBatch(), "Tap on the \nright side \nto attack.", widthWithZoom/7*5,
 					heightWithZoom/10*8);
+			/*
 			main.gameFont.draw(menuStage.getBatch(), 
 					"Find the door to the next floor." + 
 					"\nMonsters get harder every floor" + 
 					"\nThe maze gets bigger every floor." + 
 					"\nYou upgrade every other floor.", 5, 
 					heightWithZoom/10 * 5);
+					*/
 		}
 		
 		if(currentLayout == upgradeMenu){
@@ -402,12 +406,17 @@ public class MenuScreen implements Screen, InputProcessor{
 	}
 	
 	public void buttonCode(String buttonName){
+
 		System.out.println("BUTTON CODDE: " + buttonName);
+		if(buttonName == null)return;
 		if(currentLayout == mainMenu){
 
 			if(buttonName == "Play"){
 				
 				//main.fadeOut = true;
+				if(main.adHandler != null){
+					main.adHandler.loadAds();
+				}
 				main.setFadeCode("play");
 				main.fadeOut();
 			}

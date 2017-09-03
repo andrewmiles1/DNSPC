@@ -13,7 +13,7 @@ public abstract class Poolable {
 		//does nothing, can't return abstract class
 		return null;
 	}
-	
+
 	public abstract void reset();//resets the object
 	public abstract void retire();//retires object
 	public boolean getIfInUse(){

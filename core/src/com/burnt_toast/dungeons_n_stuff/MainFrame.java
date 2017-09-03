@@ -1,15 +1,13 @@
 package com.burnt_toast.dungeons_n_stuff;
 
-import java.util.function.Consumer;
 
-import com.badlogic.gdx.ApplicationAdapter;
+
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
@@ -44,17 +42,21 @@ public class MainFrame extends Game {
 	public static TextureRegion[] archerFrames;//0 and 1 are person and 2 is meelee and 3 is arrow
 	public static TextureRegion[] wizardFrames;//0 and 1 are person and 2 is meelee 
 	public static TextureRegion[] warriorFrames;//0 and 1 are person and 2 is meelee and 3 is throwing sword.
+
+	//MAP STUFF
+	public static TextureRegion[] mapTiles; //a general dictionary of just the tiles that are used.
+	//initilized in the splash screen.
 	
 	//teh monstas YEAH
 	public static TextureRegion[] slimeFrames;//0 and 1 are person and 2 is meelee and 3 is ranged
 	
 	public static TextureRegion[] swordStages;//0 1 and 2 are the 3 levels
-	public static TextureRegion[] ringStages;
-	public static TextureRegion[] arrowStages;
+	public static TextureRegion arrow;
+    public static TextureRegion arrowBox;
 	
 	public static TextureRegion[] doorFrames;
 	public static TextureRegion[] buttonFrames;
-	public Consumer fadeOutCode;//code that's run when a fade out completes.
+    public static TextureRegion key;
 	
 	public float fadeTracker;//to track the fade function
 	public float fadeFactor = 2;
@@ -64,13 +66,22 @@ public class MainFrame extends Game {
 	public static final float SCREEN_WIDTH = 12 * 30;//480
 	public static final float SCREEN_HEIGHT = 6 * 30;
 	
-	public static final String VERSION = "1.1";
+	public static final String VERSION = "1.2";
 	
 	public static final float TILE_SIZE = 8;//8 * 2
 	
 	TmxMapLoader mapLoader;
 	public OrthogonalTiledMapRenderer otmr;
-	
+
+	//FOR ADS
+	IActivityRequestHandler adHandler;
+
+	public MainFrame(IActivityRequestHandler handler){
+		this();
+		adHandler = handler;
+	}
+
+
 	public MainFrame(){
 		inputMulti = new InputMultiplexer();
 		fadeCodename = "none";
