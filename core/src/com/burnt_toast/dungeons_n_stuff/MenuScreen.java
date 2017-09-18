@@ -443,7 +443,7 @@ public class MenuScreen implements Screen, InputProcessor{
 				else if(buttonName.contains("Speed")){
 					upgPointsLeft--;
 					PlayScreen.getCurrentPlayer().setMovementSpeed();
-					setDamageMod(++speedMod);
+					setSpeedMod(++speedMod);
 				}
 				else if(buttonName.contains("Attack")){//attack radius
 					//upgPointsLeft--;

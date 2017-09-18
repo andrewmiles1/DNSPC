@@ -1,0 +1,14 @@
+Monsters:
+melee monster
+fly through monster
+projectile monster
+
+money - gold? Not sure if I need this but it might make it more fun
+
+steps: 
+make collision change for slimes
+change spawn(more of) and strength of slimes
+projectile slimes - much fewer than normal slimes per spawn
+gold from slimes and barrels
+
+

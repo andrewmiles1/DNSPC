@@ -20,6 +20,7 @@ public class MapCreationTool {
 	TiledMapTile wall;
 	MazeGenerator mazeGen;
 	int sizeUpFactor = 3;
+	int temp;
 	
 	TiledMapTile topLeftTile;
 	TiledMapTile topTile;
@@ -92,6 +93,8 @@ public class MapCreationTool {
 		botLeftCorner = tileSet.getTile(17);
 		botRightCorner = tileSet.getTile(18);
 		doorTile = tileSet.getTile(7);
+		
+		deadEndCoords = new LinkedList<Vector2>();
 		
 
 	}
@@ -286,7 +289,39 @@ public class MapCreationTool {
 
 
 		//CALC DEAD ENDS HERE.
-
+		//FIXME take out the system outs if you want
+		//clear the list before you make it again
+		deadEndCoords.clear();
+		System.out.println("********DEAD ENDS**********");
+		for(int i = 1; i < smallCollisionMap.length-1; i++){
+			for(int k = 1; k < smallCollisionMap.length-1; k++){
+				//first two fors are to loop through the small maze
+				temp = 0;
+				for(int j = -1; j < 2; j+= 2){//clever for loops to loop through neighbors
+					if(smallCollisionMap[i+j][k] == 1){//if x neighbor is a wall
+						temp++;
+					}
+				}
+				for(int m = -1; m < 2; m += 2){
+					if(smallCollisionMap[i][k+m] == 1){
+						temp++;
+					}
+				}
+				if(temp == 3 && smallCollisionMap[i][k] == 0){
+					deadEndCoords.add(new Vector2(i * 3 + 1, k * 3 + 1));
+					System.out.println("at: " + i + ", " + k);
+				}
+			}
+		}
+		//randomize the dead end list for later use
+		for(int i = 0; i < deadEndCoords.size(); i++){
+			deadEndCoords.addLast(deadEndCoords.remove((int)(Math.random() * (deadEndCoords.size() - i))));
+		}
+		//display the list again
+		System.out.println("**Randomized List:");
+		for(int i = 0; i < deadEndCoords.size(); i++)
+			System.out.println("at: " + deadEndCoords.get(i).x + ", " + deadEndCoords.get(i).y);
+		System.out.println("***************************");
 
 
 		//copies the small collision maze to the larger one using the size up factor.
@@ -304,7 +339,7 @@ public class MapCreationTool {
 		//displays maze from the 3 by 3 tiles
 		for(int i = 0; i < currentCollisionMap.length; i++){
 			for(int k = 0; k < currentCollisionMap.length; k++){
-				System.out.print(currentCollisionMap[i][k]);
+				System.out.print(currentCollisionMap[k][i]);
 			}
 			System.out.println();
 		}
@@ -326,5 +361,9 @@ public class MapCreationTool {
 		}
 		makeItLookPretty();
 		return currentCollisionMap;
+	}
+	
+	public LinkedList<Vector2> getDeadEndList(){
+		return deadEndCoords;
 	}
 }

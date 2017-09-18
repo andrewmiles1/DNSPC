@@ -230,6 +230,7 @@ public class PlayScreen implements Screen, InputProcessor{
 			orthoCam.update();
 
 			miniMap.setMidOfScreen(hudStage.getWidth()/2, hudStage.getHeight()/2);
+			System.out.println("~~~~~~" + keyRect);
 			
 			
 			
@@ -317,7 +318,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		hudStage.getBatch().begin();
 		//FIXME put the key inside a better box on screen.
 		//placement is minus width * 3 just so it looks better and not right next to the button.
-		if(keyFound)hudStage.getBatch().draw(key, pauseBut.getX() - key.getRegionWidth() * 3, pauseBut.getY(), key.getRegionWidth() * 2, key.getRegionHeight() * 2);//draws at top right corner. Not pretty, fix later.
+		if(keyFound)hudStage.getBatch().draw(key, pauseBut.getX() - key.getRegionWidth() * 3, pauseBut.getY()/2-key.getRegionHeight()/2,
+				key.getRegionWidth() * 2, key.getRegionHeight() * 2);//draws at top right corner. Not pretty, fix later.
 		//TEMP CODE ABOVE
 		
 		hudStage.getBatch().draw(healthBorder, hudStage.getWidth()/2- healthBorder.getRegionWidth(), hudStage.getHeight()-35,
@@ -525,12 +527,15 @@ public class PlayScreen implements Screen, InputProcessor{
 		endDoor.setY((collisionMap.length-3)*8);
 		endDoorRect.setX((collisionMap.length - 5) * 8);
 		endDoorRect.setY((collisionMap.length-3) * 8 - endDoorRect.getHeight());
+		//place keys and chests with a loop later if
+		//you have more stuff you want to add to dead ends
 		if(floorLevel < 3){//if first two levels, then button is next to door
 			keyRect.x = (collisionMap.length-5)* MainFrame.TILE_SIZE;
 			keyRect.y = (collisionMap.length-6)* MainFrame.TILE_SIZE;
 		}
 		else{
-			//if the floor level is greater than 2.
+			//FIXME old code for placing keys
+/*			//if the floor level is greater than 2.
 			for(int i = 0; i < 100; i++){
 				endButIndexX = (int)(Math.random() * collisionMap.length);
 				endButIndexY = (int)(Math.random() * collisionMap.length);
@@ -540,7 +545,11 @@ public class PlayScreen implements Screen, InputProcessor{
 					keyRect.x = 1 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
 					keyRect.y = 3 * (MainFrame.TILE_SIZE * 3) + MainFrame.TILE_SIZE;
 				}
-			}
+			}*/
+			System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~`");
+			keyRect.x = mapTool.getDeadEndList().getFirst().x * MainFrame.TILE_SIZE + keyRect.getWidth()/2;
+			keyRect.y = mapTool.getDeadEndList().getFirst().y * MainFrame.TILE_SIZE + keyRect.getHeight()/2;
+			System.out.println(keyRect);
 		}
 		
 
@@ -551,6 +560,7 @@ public class PlayScreen implements Screen, InputProcessor{
 		miniMap.activateBlock(1, 1, this, false);
 		pause = false;
 		doorIsOpen = false;
+		endDoor.reset();
 		keyFound = false;
 		if(floorLevel >=6) currentPlayer.maxHealth = 100;
 		//main.fadeIn();
@@ -753,6 +763,8 @@ public class PlayScreen implements Screen, InputProcessor{
 		}
 		else if(keycode == Keys.G){
 			doorIsOpen = true;
+			keyFound = true;
+			endDoor.play();
 			currentPlayer.setPosition(endDoorRect.getX(), endDoorRect.getY());
 		}
 		else if(keycode == Keys.UP){

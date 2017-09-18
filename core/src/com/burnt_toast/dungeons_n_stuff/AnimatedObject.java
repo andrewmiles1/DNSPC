@@ -112,6 +112,9 @@ public class AnimatedObject {
 	public void setLoop(boolean loop) {
 		this.loop = loop;
 	}
+	public void reset(){
+		this.frameNum = 0;
+	}
 	
 	/**
 	 * Call to see if the animation has played and finished.
